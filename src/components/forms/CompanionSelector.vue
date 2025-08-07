@@ -121,13 +121,9 @@
 
         <!-- Actions -->
         <div class="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200">
-          <button
-            type="button"
-            @click="$emit('close')"
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
+          <Button type="button" variant="secondary" size="sm" @click="$emit('close')">
             Cancel
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -139,6 +135,7 @@ import { ref, computed } from 'vue'
 import type { PlayerCharacter, CompanionAssignment, WoWClass, Role, TierLevel } from '@/types'
 import { useCharactersStore } from '@/stores/characters'
 import { CLASS_RACE_RESTRICTIONS } from '@/data/wow-data'
+import Button from '../ui/Button.vue'
 
 // Props
 interface Props {

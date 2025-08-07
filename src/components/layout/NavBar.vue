@@ -41,20 +41,15 @@
             </span>
 
             <!-- Sign Up button for guest users -->
-            <button
+            <Button
               v-if="supabaseUser && supabaseUser.is_anonymous"
+              size="sm"
               @click="showSignUpModal = true"
-              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
             >
               Sign Up
-            </button>
+            </Button>
 
-            <button
-              @click="signOut"
-              class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center cursor-pointer"
-            >
-              Sign Out
-            </button>
+            <Button variant="secondary" size="sm" @click="signOut"> Sign Out </Button>
           </div>
         </div>
       </div>
@@ -160,13 +155,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
-import { ThemeSupa } from '@supabase/auth-ui-shared'
-import { Auth } from '@supa-kit/auth-ui-vue'
+import { ref, watch } from 'vue'
 import { useCharactersStore } from '@/stores/characters'
 import { useRaidsStore } from '@/stores/raids'
 import { useSupabase } from '@/composables/useSupabase'
-import { useStorage } from '@/composables/useStorage'
+import Button from '../ui/Button.vue'
 
 // State
 const mobileMenuOpen = ref(false)

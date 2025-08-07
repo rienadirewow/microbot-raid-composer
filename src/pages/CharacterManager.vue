@@ -10,12 +10,7 @@
         description="Manage your WoW characters and their tier progression"
       >
         <template #action>
-          <button
-            @click="showCreateForm = true"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-          >
-            <span>Add Character</span>
-          </button>
+          <Button @click="showCreateForm = true">Add Character</Button>
         </template>
       </PageHeader>
 
@@ -82,6 +77,7 @@ import EmptyState from '../components/ui/EmptyState.vue'
 import PageHeader from '../components/layout/PageHeader.vue'
 import CharacterList from '../components/layout/CharacterList.vue'
 import LoadingState from '../components/ui/LoadingState.vue'
+import Button from '../components/ui/Button.vue'
 
 // State
 const showCreateForm = ref(false)

@@ -39,12 +39,9 @@
                 Start building raids immediately. Your data will be saved and you can sign up with
                 an email later.
               </p>
-              <button
-                @click="signInAnonymously"
-                class="w-full bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-              >
+              <Button variant="secondary" size="lg" class="w-full" @click="signInAnonymously">
                 Get Started
-              </button>
+              </Button>
               <p class="text-gray-600 mb-6 text-xs mt-2">
                 Your data will be available only in this browser on this device.
               </p>
@@ -115,6 +112,7 @@ import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { Auth } from '@supa-kit/auth-ui-vue'
 import NavBar from '@/components/layout/NavBar.vue'
 import { useSupabase } from '@/composables/useSupabase'
+import Button from '@/components/ui/Button.vue'
 
 const { supabaseClient, supabaseUser } = useSupabase()
 

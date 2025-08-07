@@ -113,7 +113,7 @@
 import { ref, watch } from 'vue'
 import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { Auth } from '@supa-kit/auth-ui-vue'
-import NavBar from '@/components/NavBar.vue'
+import NavBar from '@/components/layout/NavBar.vue'
 import { useSupabase } from '@/composables/useSupabase'
 
 const { supabaseClient, supabaseUser } = useSupabase()

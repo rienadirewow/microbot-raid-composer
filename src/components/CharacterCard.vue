@@ -59,7 +59,7 @@
 import { ref } from 'vue'
 import type { PlayerCharacter, TierLevel } from '@/types'
 import { getClassColor } from '@/data/classes'
-import TierSelector from './TierSelector.vue'
+import TierSelector from './forms/TierSelector.vue'
 
 // Props
 interface Props {

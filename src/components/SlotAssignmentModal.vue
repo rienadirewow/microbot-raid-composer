@@ -4,29 +4,18 @@
       <!-- License Type Selection - Only show for non-first slots -->
       <div v-if="!isFirstSlot">
         <h3 class="text-lg font-bold text-slate-800 mb-3">Select License Type</h3>
-        <div class="flex space-x-3">
-          <button
-            @click="selectedTierType = 'R'"
-            class="flex items-center px-4 py-2 rounded-lg font-semibold transition-all duration-200 hover:shadow-md"
-            :class="
-              selectedTierType === 'R'
-                ? 'bg-blue-600 text-white shadow-lg'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            "
-          >
-            Raid License (T{{ character.unlockedTiers.r }})
-          </button>
-          <button
-            @click="selectedTierType = 'D'"
-            class="flex items-center px-4 py-2 rounded-lg font-semibold transition-all duration-200 hover:shadow-md"
-            :class="
-              selectedTierType === 'D'
-                ? 'bg-purple-600 text-white shadow-lg'
-                : 'bg-purple-100 text-gray-700 hover:bg-purple-200'
-            "
-          >
-            Dungeon License (T{{ character.unlockedTiers.d }})
-          </button>
+        <div class="space-y-4">
+          <div>
+            <h4 class="text-sm font-medium text-slate-700 mb-2">Raid License</h4>
+            <TierSelector v-model="raidTierSelector" @update:model-value="handleRaidTierChange" />
+          </div>
+          <div>
+            <h4 class="text-sm font-medium text-slate-700 mb-2">Dungeon License</h4>
+            <TierSelector
+              v-model="dungeonTierSelector"
+              @update:model-value="handleDungeonTierChange"
+            />
+          </div>
         </div>
       </div>
 
@@ -136,10 +125,11 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { PlayerSlot, PlayerCharacter, Role, WoWClass, TierType } from '@/types'
+import type { PlayerSlot, PlayerCharacter, Role, WoWClass, TierType, TierLevel } from '@/types'
 import { CLASS_ROLE_RESTRICTIONS } from '@/data/wow-data'
 import Modal from './ui/Modal.vue'
 import Button from './ui/Button.vue'
+import TierSelector from './forms/TierSelector.vue'
 
 // Props
 interface Props {
@@ -156,7 +146,7 @@ const props = defineProps<Props>()
 // Emits
 const emit = defineEmits<{
   close: []
-  assignSlot: [wowClass: WoWClass, role: Role, tierType: TierType]
+  assignSlot: [wowClass: WoWClass, role: Role, tierType: TierType, tier: TierLevel]
   clearSlot: []
 }>()
 
@@ -166,6 +156,17 @@ const selectedClass = ref<WoWClass>(
   props.currentSlot?.class || (props.isFirstSlot ? props.character.class : 'warrior'),
 )
 const selectedTierType = ref<TierType>(props.currentSlot?.tierType || 'R')
+
+// Tier selector state
+const raidTierSelector = ref({
+  r: props.currentSlot?.tierType === 'R' ? props.currentSlot?.tier || 0 : 0,
+  d: 0,
+})
+
+const dungeonTierSelector = ref({
+  r: 0,
+  d: props.currentSlot?.tierType === 'D' ? props.currentSlot?.tier || 0 : 0,
+})
 
 // Computed
 const modalTitle = computed(() => {
@@ -279,9 +280,28 @@ const getClassColor = (wowClass: string) => {
 }
 
 const getCurrentTier = () => {
-  return selectedTierType.value === 'R'
-    ? props.character.unlockedTiers.r
-    : props.character.unlockedTiers.d
+  if (props.isFirstSlot) {
+    return selectedTierType.value === 'R'
+      ? props.character.unlockedTiers.r
+      : props.character.unlockedTiers.d
+  }
+  
+  // For group members, use the selected tier from the appropriate selector
+  if (selectedTierType.value === 'R') {
+    return raidTierSelector.value.r
+  } else {
+    return dungeonTierSelector.value.d
+  }
+}
+
+const handleRaidTierChange = (value: { r: TierLevel; d: TierLevel }) => {
+  raidTierSelector.value = value
+  selectedTierType.value = 'R'
+}
+
+const handleDungeonTierChange = (value: { r: TierLevel; d: TierLevel }) => {
+  dungeonTierSelector.value = value
+  selectedTierType.value = 'D'
 }
 
 const getClassButtonBackground = (wowClass: string) => {
@@ -296,7 +316,8 @@ const getClassButtonBackground = (wowClass: string) => {
 
 const handleAssign = () => {
   if (canAssignRole(selectedClass.value, selectedRole.value)) {
-    emit('assignSlot', selectedClass.value, selectedRole.value, selectedTierType.value)
+    const tier = getCurrentTier()
+    emit('assignSlot', selectedClass.value, selectedRole.value, selectedTierType.value, tier)
     emit('close')
   }
 }

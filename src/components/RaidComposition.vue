@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import type { PlayerCharacter, CharacterRow, PlayerSlot, WoWClass, Role, TierType } from '@/types'
+import type { PlayerCharacter, CharacterRow, PlayerSlot, WoWClass, Role, TierType, TierLevel } from '@/types'
 import RaidGrid from './RaidGrid.vue'
 import SlotAssignmentModal from './SlotAssignmentModal.vue'
 
@@ -111,18 +111,16 @@ const closeAssignmentModal = () => {
   assignmentModal.value.isOpen = false
 }
 
-const handleAssignSlot = (wowClass: WoWClass, role: Role, tierType: TierType) => {
+const handleAssignSlot = (wowClass: WoWClass, role: Role, tierType: TierType, tier: TierLevel) => {
   const row = composition.value[assignmentModal.value.rowIndex]
   if (!row) return
 
   const isFirstSlot = assignmentModal.value.slotIndex === 0
-  const selectedTier =
-    tierType === 'R' ? row.character.unlockedTiers.r : row.character.unlockedTiers.d
 
   const newSlot: PlayerSlot = {
     class: wowClass,
     role,
-    tier: selectedTier,
+    tier,
     tierType,
     isCharacter: isFirstSlot,
     characterName: isFirstSlot ? row.character.name : undefined,

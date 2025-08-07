@@ -13,11 +13,16 @@
       :raid-name="raidsStore.currentRaid.name"
       raid-type="Mixed Faction Raid"
       :filled-slots="raidsStore.filledSlots"
-      :characters="charactersStore.characters"
-      :get-available-companion-slots="getAvailableCompanionSlots"
       @save="saveCurrentRaid"
       @export="exportRaid"
       @clear="clearCurrentRaid"
+    />
+
+    <!-- Raid Composition -->
+    <RaidComposition
+      v-if="raidsStore.currentRaid"
+      :characters="charactersStore.characters"
+      @update-composition="updateRaidComposition"
     />
 
     <!-- No Current Raid -->
@@ -64,7 +69,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import type { PlayerCharacter } from '@/types'
+import type { PlayerCharacter, CharacterRow } from '@/types'
 import { useCharactersStore } from '@/stores/characters'
 import { useRaidsStore } from '@/stores/raids'
 import PageHeader from '../components/layout/PageHeader.vue'
@@ -73,6 +78,7 @@ import EmptyState from '../components/ui/EmptyState.vue'
 import WarningBanner from '../components/ui/WarningBanner.vue'
 import RaidStatus from '../components/RaidStatus.vue'
 import SavedRaidCard from '../components/SavedRaidCard.vue'
+import RaidComposition from '../components/RaidComposition.vue'
 
 // Stores
 const charactersStore = useCharactersStore()
@@ -112,12 +118,8 @@ const loadRaid = (raidId: string) => {
   raidsStore.loadRaid(raidId)
 }
 
-const getAvailableCompanionSlots = (character: PlayerCharacter) => {
-  // Count how many companions from this character are already assigned to the current raid
-  const assignedCompanions = raidsStore.currentRaidSlots.filter(
-    (slot) => slot.assignment?.ownerId === character.id,
-  ).length
-
-  return Math.max(0, 4 - assignedCompanions)
+const updateRaidComposition = (composition: CharacterRow[]) => {
+  // TODO: Update the raid store with the new composition
+  console.log('Raid composition updated:', composition)
 }
 </script>

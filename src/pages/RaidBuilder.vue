@@ -16,6 +16,7 @@
       @export="exportRaid"
       @clear="clearCurrentRaid"
       @delete="deleteCurrentRaid"
+      @update-name="updateRaidName"
     />
 
     <!-- Raid Composition -->
@@ -125,6 +126,9 @@ const loadRaid = (raidId: string) => {
 
 const updateRaidComposition = (composition: CharacterRow[]) => {
   // TODO: Update the raid store with the new composition
+}
 
+const updateRaidName = (newName: string) => {
+  raidsStore.updateCurrentRaidName(newName)
 }
 </script>

@@ -42,7 +42,7 @@ export const useRaidsStore = defineStore('raids', () => {
 
     const newRaid: RaidComposition = {
       id: crypto.randomUUID(),
-      name: name || `New ${faction} Raid`,
+      name: name || 'New Raid',
       faction,
       slots,
       createdAt: new Date(),
@@ -128,6 +128,22 @@ export const useRaidsStore = defineStore('raids', () => {
     return await deleteRaid(currentRaid.value.id)
   }
 
+  // Update current raid name
+  const updateCurrentRaidName = (newName: string) => {
+    if (!currentRaid.value) return false
+    
+    currentRaid.value.name = newName
+    currentRaid.value.updatedAt = new Date()
+    
+    // Update in the raids array as well
+    const index = raids.value.findIndex((r) => r.id === currentRaid.value!.id)
+    if (index !== -1) {
+      raids.value[index] = { ...currentRaid.value }
+    }
+    
+    return true
+  }
+
   // Generate export string for the current raid
   const generateExportString = () => {
     if (!currentRaid.value) return ''
@@ -177,6 +193,7 @@ export const useRaidsStore = defineStore('raids', () => {
     loadRaid,
     deleteRaid,
     deleteCurrentRaid,
+    updateCurrentRaidName,
     generateExportString,
 
     // Computed

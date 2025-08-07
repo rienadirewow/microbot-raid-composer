@@ -168,7 +168,7 @@ const selectedTierType = ref<TierType>(props.currentSlot?.tierType || 'R')
 // License type selection state
 const selectedLicenseType = ref<{ type: TierType; tier: TierLevel }>({
   type: props.currentSlot?.tierType || 'R',
-  tier: props.currentSlot?.tier || 0
+  tier: props.currentSlot?.tier || 0,
 })
 
 // Computed
@@ -178,9 +178,9 @@ const modalTitle = computed(() => {
 
 const roleButtons = computed(() => {
   const baseRoles = [
-    { role: 'tank' as Role, icon: 'ShieldIcon', color: '#3B82F6' },
-    { role: 'healer' as Role, icon: 'HeartIcon', color: '#10B981' },
-    { role: 'dps' as Role, icon: 'SwordIcon', color: '#EF4444' },
+    { role: 'tank' as Role, icon: ShieldIcon, color: '#3B82F6' },
+    { role: 'healer' as Role, icon: HeartIcon, color: '#10B981' },
+    { role: 'dps' as Role, icon: SwordIcon, color: '#EF4444' },
   ]
 
   // For lite characters (non-control members), only allow applicable roles
@@ -315,8 +315,9 @@ const selectLicenseType = (type: TierType, tier: TierLevel) => {
 }
 
 const getLicenseTypeButtonClass = (type: TierType, tier: TierLevel) => {
-  const isSelected = selectedLicenseType.value.type === type && selectedLicenseType.value.tier === tier
-  
+  const isSelected =
+    selectedLicenseType.value.type === type && selectedLicenseType.value.tier === tier
+
   // Get tier color based on WoW gear quality colors
   const getTierColor = (tier: TierLevel) => {
     switch (tier) {

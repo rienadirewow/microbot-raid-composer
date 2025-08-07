@@ -24,6 +24,7 @@
       v-if="raidsStore.currentRaid"
       :characters="charactersStore.characters"
       :current-raid="raidsStore.currentRaid"
+      :current-player-id="currentPlayerId"
       @update-composition="updateRaidComposition"
     />
 
@@ -69,8 +70,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
-import type { PlayerCharacter, CharacterRow, CompanionAssignment } from '@/types'
+import { onMounted, ref } from 'vue'
+import type { CharacterRow, CompanionAssignment } from '@/types'
 import { useCharactersStore } from '@/stores/characters'
 import { useRaidsStore } from '@/stores/raids'
 import PageHeader from '../components/layout/PageHeader.vue'
@@ -84,6 +85,9 @@ import RaidComposition from '../components/RaidComposition.vue'
 // Stores
 const charactersStore = useCharactersStore()
 const raidsStore = useRaidsStore()
+
+// State
+const currentPlayerId = ref<string>('')
 
 // Lifecycle
 onMounted(async () => {
@@ -125,7 +129,7 @@ const loadRaid = (raidId: string) => {
   raidsStore.loadRaid(raidId)
 }
 
-const updateRaidComposition = (composition: CharacterRow[]) => {
+const updateRaidComposition = async (composition: CharacterRow[]) => {
   if (!raidsStore.currentRaid) return
 
   // Convert the new composition format to the old format
@@ -169,9 +173,14 @@ const updateRaidComposition = (composition: CharacterRow[]) => {
   // Update the current raid with the new slots
   raidsStore.currentRaid.slots = updatedSlots
   raidsStore.currentRaid.updatedAt = new Date()
+
+  // Autosave the raid
+  await raidsStore.saveCurrentRaid()
 }
 
-const updateRaidName = (newName: string) => {
+const updateRaidName = async (newName: string) => {
   raidsStore.updateCurrentRaidName(newName)
+  // Autosave the raid after name change
+  await raidsStore.saveCurrentRaid()
 }
 </script>

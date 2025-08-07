@@ -2,7 +2,13 @@
   <div
     class="bg-gradient-to-br from-slate-50 to-white rounded-xl shadow-lg border border-slate-200 p-6"
   >
-    <RaidGrid :composition="composition" :characters="characters" @slot-click="handleSlotClick" />
+    <RaidGrid
+      :composition="composition"
+      :characters="characters"
+      :current-player-id="currentPlayerId"
+      @slot-click="handleSlotClick"
+      @update-current-player="handleUpdateCurrentPlayer"
+    />
 
     <SlotAssignmentModal
       :is-open="assignmentModal.isOpen"
@@ -37,6 +43,7 @@ import SlotAssignmentModal from './SlotAssignmentModal.vue'
 interface Props {
   characters: PlayerCharacter[]
   currentRaid?: RaidCompositionType
+  currentPlayerId?: string
 }
 
 const props = defineProps<Props>()
@@ -48,6 +55,7 @@ const emit = defineEmits<{
 
 // State
 const composition = ref<CharacterRow[]>([])
+const currentPlayerId = ref<string>(props.currentPlayerId || '')
 const assignmentModal = ref<{
   isOpen: boolean
   rowIndex: number
@@ -75,15 +83,15 @@ const initializeCharacterGroups = () => {
     // Initialize with existing raid data
     composition.value = props.characters.map((character) => {
       const slots: (PlayerSlot | null)[] = Array(5).fill(null)
-      
+
       // Find the character's row in the raid (assuming characters are in order)
-      const characterIndex = props.characters.findIndex(c => c.id === character.id)
+      const characterIndex = props.characters.findIndex((c) => c.id === character.id)
       if (characterIndex !== -1) {
         // Map raid slots to character slots
         for (let i = 0; i < 5; i++) {
           const raidSlotIndex = characterIndex * 5 + i
           const raidSlot = props.currentRaid!.slots[raidSlotIndex]
-          
+
           if (raidSlot?.assignment) {
             slots[i] = {
               class: raidSlot.assignment.class,
@@ -188,13 +196,21 @@ const handleClearSlot = () => {
   emit('update-composition', composition.value)
 }
 
+const handleUpdateCurrentPlayer = (playerId: string) => {
+  currentPlayerId.value = playerId
+}
+
 // Lifecycle
 onMounted(() => {
   initializeCharacterGroups()
 })
 
 // Watch for changes in currentRaid or characters
-watch([() => props.currentRaid, () => props.characters], () => {
-  initializeCharacterGroups()
-}, { deep: true })
+watch(
+  [() => props.currentRaid, () => props.characters],
+  () => {
+    initializeCharacterGroups()
+  },
+  { deep: true },
+)
 </script>

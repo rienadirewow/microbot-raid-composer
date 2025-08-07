@@ -7,7 +7,7 @@
       <h3 class="font-medium text-gray-900">{{ raidName }}</h3>
       <div class="w-3 h-3 rounded-full bg-purple-600"></div>
     </div>
-    <p class="text-sm text-gray-600 mb-2">{{ raidType }}</p>
+
     <div class="flex items-center justify-between text-sm">
       <span class="text-gray-500">{{ filledSlots }}/40 filled</span>
       <span class="text-gray-400">{{ formattedDate }}</span>
@@ -21,7 +21,6 @@ import { computed } from 'vue'
 // Props
 interface Props {
   raidName: string
-  raidType: string
   filledSlots: number
   updatedAt: string | Date
 }

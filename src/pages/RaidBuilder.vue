@@ -11,7 +11,6 @@
     <RaidStatus
       v-if="raidsStore.currentRaid"
       :raid-name="raidsStore.currentRaid.name"
-      raid-type="Mixed Faction Raid"
       :filled-slots="raidsStore.filledSlots"
       @save="saveCurrentRaid"
       @export="exportRaid"
@@ -45,7 +44,6 @@
           v-for="raid in raidsStore.raids"
           :key="raid.id"
           :raid-name="raid.name"
-          raid-type="Mixed Faction"
           :filled-slots="raid.slots.filter((s) => s.assignment).length"
           :updated-at="raid.updatedAt"
           @click="loadRaid(raid.id)"

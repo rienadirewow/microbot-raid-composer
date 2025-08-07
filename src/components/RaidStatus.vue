@@ -3,7 +3,6 @@
     <div class="flex items-center justify-between mb-4">
       <div>
         <h2 class="text-xl font-semibold text-gray-900">{{ raidName }}</h2>
-        <p class="text-sm text-gray-600">{{ raidType }}</p>
       </div>
       <ProgressBar :value="filledSlots" :max="40" />
     </div>
@@ -26,7 +25,6 @@ import FactionBadge from './ui/FactionBadge.vue'
 // Props
 interface Props {
   raidName: string
-  raidType: string
   filledSlots: number
 }
 

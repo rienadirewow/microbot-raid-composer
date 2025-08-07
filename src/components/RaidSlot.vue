@@ -13,7 +13,7 @@
     >
       {{ getRoleDisplayName(slot.role) }}
     </div>
-    
+
     <div class="flex items-start justify-between h-full">
       <div class="flex-1 min-w-0">
         <div class="font-semibold text-base truncate" :style="{ color: getDisplayNameColor() }">
@@ -67,21 +67,30 @@ const slotClasses = computed(() => {
     return 'border-dashed border-gray-300 bg-white hover:border-gray-400'
   }
 
-  if (props.isFirstSlot) {
-    // Use tier-related colors for first slot
-    if (props.slot.tierType === 'R') {
-      return 'border-blue-500 border-2'
-    } else {
-      return 'border-purple-500 border-2'
+  // Get tier level color based on tier level (0-5)
+  const getTierBorderColor = (tier: number) => {
+    switch (tier) {
+      case 0:
+        return 'border-gray-400'
+      case 1:
+        return 'border-gray-200'
+      case 2:
+        return 'border-blue-400'
+      case 3:
+        return 'border-purple-400'
+      case 4:
+        return 'border-orange-400'
+      case 5:
+        return 'border-orange-500'
+      default:
+        return 'border-gray-400'
     }
   }
 
-  // Use tier-related colors for other slots
-  if (props.slot.tierType === 'R') {
-    return 'border-blue-400'
-  } else {
-    return 'border-purple-400'
-  }
+  const borderColor = getTierBorderColor(props.slot.tier)
+  const borderWidth = props.isFirstSlot ? 'border-2' : 'border'
+
+  return `${borderColor} ${borderWidth}`
 })
 
 const iconClasses = computed(() => {

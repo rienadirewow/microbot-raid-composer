@@ -1,8 +1,8 @@
 <template>
   <Modal v-if="isOpen" :title="modalTitle" @close="$emit('close')">
     <div class="space-y-6">
-      <!-- License Type Selection -->
-      <div>
+      <!-- License Type Selection - Only show for non-first slots -->
+      <div v-if="!isFirstSlot">
         <h3 class="text-lg font-bold text-slate-800 mb-3">Select License Type</h3>
         <div class="flex space-x-3">
           <button

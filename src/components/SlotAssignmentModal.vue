@@ -318,13 +318,9 @@ const getClassButtonBackground = (wowClass: string) => {
     return '#F3F4F6' // gray-100 for disabled
   }
 
-  if (selectedClass.value === wowClass) {
-    return '#EFF6FF' // blue-50 for selected
-  }
-
-  // Use class color as background with higher opacity for better visibility
+  // Use class color as background with reduced opacity
   const classColor = getClassColor(wowClass)
-  return classColor + '40' // Add 40% opacity
+  return classColor + '25' // Add 25% opacity
 }
 
 const handleAssign = () => {

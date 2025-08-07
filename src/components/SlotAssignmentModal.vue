@@ -4,18 +4,27 @@
       <!-- License Type Selection - Only show for non-first slots -->
       <div v-if="!isFirstSlot">
         <h3 class="text-lg font-bold text-slate-800 mb-3">Select License Type</h3>
-        <div class="space-y-4">
-          <div>
-            <h4 class="text-sm font-medium text-slate-700 mb-2">Raid License</h4>
-            <TierSelector v-model="raidTierSelector" @update:model-value="handleRaidTierChange" />
-          </div>
-          <div>
-            <h4 class="text-sm font-medium text-slate-700 mb-2">Dungeon License</h4>
-            <TierSelector
-              v-model="dungeonTierSelector"
-              @update:model-value="handleDungeonTierChange"
-            />
-          </div>
+        <div class="grid grid-cols-6 gap-1">
+          <!-- Raid tiers -->
+          <button
+            v-for="tier in availableRaidTiers"
+            :key="`R${tier}`"
+            @click="selectLicenseType('R', tier)"
+            class="flex items-center justify-center px-2 py-1 border rounded cursor-pointer transition-colors text-xs"
+            :class="getLicenseTypeButtonClass('R', tier)"
+          >
+            T{{ tier }}R
+          </button>
+          <!-- Dungeon tiers -->
+          <button
+            v-for="tier in availableDungeonTiers"
+            :key="`D${tier}`"
+            @click="selectLicenseType('D', tier)"
+            class="flex items-center justify-center px-2 py-1 border rounded cursor-pointer transition-colors text-xs"
+            :class="getLicenseTypeButtonClass('D', tier)"
+          >
+            T{{ tier }}D
+          </button>
         </div>
       </div>
 
@@ -129,7 +138,6 @@ import type { PlayerSlot, PlayerCharacter, Role, WoWClass, TierType, TierLevel }
 import { CLASS_ROLE_RESTRICTIONS } from '@/data/wow-data'
 import Modal from './ui/Modal.vue'
 import Button from './ui/Button.vue'
-import TierSelector from './forms/TierSelector.vue'
 
 // Props
 interface Props {
@@ -157,15 +165,10 @@ const selectedClass = ref<WoWClass>(
 )
 const selectedTierType = ref<TierType>(props.currentSlot?.tierType || 'R')
 
-// Tier selector state
-const raidTierSelector = ref({
-  r: props.currentSlot?.tierType === 'R' ? props.currentSlot?.tier || 0 : 0,
-  d: 0,
-})
-
-const dungeonTierSelector = ref({
-  r: 0,
-  d: props.currentSlot?.tierType === 'D' ? props.currentSlot?.tier || 0 : 0,
+// License type selection state
+const selectedLicenseType = ref<{ type: TierType; tier: TierLevel }>({
+  type: props.currentSlot?.tierType || 'R',
+  tier: props.currentSlot?.tier || 0
 })
 
 // Computed
@@ -209,6 +212,22 @@ const availableClasses = computed(() => {
     if (cls === 'shaman' && props.character.faction !== 'horde') return false
     return true
   })
+})
+
+const availableRaidTiers = computed(() => {
+  const tiers: TierLevel[] = []
+  for (let i = 0; i <= props.character.unlockedTiers.r; i++) {
+    tiers.push(i as TierLevel)
+  }
+  return tiers
+})
+
+const availableDungeonTiers = computed(() => {
+  const tiers: TierLevel[] = []
+  for (let i = 0; i <= props.character.unlockedTiers.d; i++) {
+    tiers.push(i as TierLevel)
+  }
+  return tiers
 })
 
 // Methods
@@ -285,23 +304,44 @@ const getCurrentTier = () => {
       ? props.character.unlockedTiers.r
       : props.character.unlockedTiers.d
   }
+
+  // For group members, use the selected license type
+  return selectedLicenseType.value.tier
+}
+
+const selectLicenseType = (type: TierType, tier: TierLevel) => {
+  selectedLicenseType.value = { type, tier }
+  selectedTierType.value = type
+}
+
+const getLicenseTypeButtonClass = (type: TierType, tier: TierLevel) => {
+  const isSelected = selectedLicenseType.value.type === type && selectedLicenseType.value.tier === tier
   
-  // For group members, use the selected tier from the appropriate selector
-  if (selectedTierType.value === 'R') {
-    return raidTierSelector.value.r
-  } else {
-    return dungeonTierSelector.value.d
+  // Get tier color based on WoW gear quality colors
+  const getTierColor = (tier: TierLevel) => {
+    switch (tier) {
+      case 0:
+        return 'bg-gray-200 text-gray-700 border-gray-500'
+      case 1:
+        return 'bg-white text-gray-900 border-gray-500'
+      case 2:
+        return 'bg-green-100 text-green-800 border-green-400'
+      case 3:
+        return 'bg-blue-100 text-blue-800 border-blue-400'
+      case 4:
+        return 'bg-purple-100 text-purple-800 border-purple-400'
+      case 5:
+        return 'bg-orange-100 text-orange-800 border-orange-400'
+      default:
+        return 'bg-gray-200 text-gray-700 border-gray-500'
+    }
   }
-}
 
-const handleRaidTierChange = (value: { r: TierLevel; d: TierLevel }) => {
-  raidTierSelector.value = value
-  selectedTierType.value = 'R'
-}
-
-const handleDungeonTierChange = (value: { r: TierLevel; d: TierLevel }) => {
-  dungeonTierSelector.value = value
-  selectedTierType.value = 'D'
+  if (isSelected) {
+    return `font-bold ${getTierColor(tier)} border-2`
+  } else {
+    return `font-bold ${getTierColor(tier)} hover:opacity-80`
+  }
 }
 
 const getClassButtonBackground = (wowClass: string) => {

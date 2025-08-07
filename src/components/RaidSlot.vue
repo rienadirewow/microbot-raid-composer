@@ -19,7 +19,7 @@
         <div class="font-semibold text-base truncate" :style="{ color: getDisplayNameColor() }">
           {{ displayName }}
         </div>
-        <div class="text-xs mt-1 font-medium truncate" :style="{ color: getTierTextColor() }">
+        <div class="text-xs font-medium truncate" :style="{ color: getTierTextColor() }">
           {{ getTierDisplayName() }}
         </div>
       </div>
@@ -56,7 +56,9 @@ const displayName = computed(() => {
   }
 
   if (props.slot.isCharacter && props.slot.characterName) {
-    return props.isFirstSlot ? `${capitalizeFirst(props.slot.characterName)}-lite` : capitalizeFirst(props.slot.characterName)
+    return props.isFirstSlot
+      ? `${capitalizeFirst(props.slot.characterName)}-lite`
+      : capitalizeFirst(props.slot.characterName)
   }
 
   return getClassDisplayName(props.slot.class)

@@ -123,7 +123,7 @@
       <div class="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg p-4 border border-slate-200">
         <p class="text-base text-slate-700 font-medium">
           <strong>Selected Gear Tier:</strong> T{{ getCurrentTier() }}{{ selectedTierType }}
-          {{ isFirstSlot ? ' (Character tier)' : ' (Inherited from character)' }}
+          {{ isFirstSlot ? ' (Character tier)' : ` (Inherited from ${character.name})` }}
         </p>
         <p class="text-base text-slate-700 font-medium mt-2">
           <strong>Faction:</strong> {{ character.faction }}

@@ -108,12 +108,7 @@
                 </svg>
               </div>
             </div>
-            <p
-              v-if="!canAssignRole(wowClass, selectedRole)"
-              class="text-sm text-red-600 mt-2 font-medium"
-            >
-              Cannot be {{ getRoleDisplayName(selectedRole) }}
-            </p>
+
             <p
               v-if="isFirstSlot && wowClass !== character.class"
               class="text-sm text-amber-600 mt-2 font-medium"
@@ -212,7 +207,7 @@ const roleButtons = computed(() => {
 
   // For lite characters (non-control members), only allow applicable roles
   if (!props.isFirstSlot) {
-    return baseRoles.filter(roleButton => {
+    return baseRoles.filter((roleButton) => {
       // Check if the character's class can fulfill this role
       return canAssignRole(props.character.class, roleButton.role)
     })

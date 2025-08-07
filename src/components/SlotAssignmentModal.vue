@@ -58,63 +58,37 @@
         </div>
       </div>
 
-      <!-- Class Selection -->
-      <div>
-        <h3 class="text-lg font-bold text-slate-800 mb-3">
-          Select Class {{ isFirstSlot ? '(Character Class)' : '' }}
-        </h3>
+      <!-- Class Selection - Only show for non-first slots -->
+      <div v-if="!isFirstSlot">
+        <h3 class="text-lg font-bold text-slate-800 mb-3">Select Class</h3>
         <div class="grid grid-cols-3 gap-3">
           <button
             v-for="wowClass in availableClasses"
             :key="wowClass"
             @click="selectedClass = wowClass"
-            :disabled="
-              !canAssignRole(wowClass, selectedRole) ||
-              (isFirstSlot && wowClass !== character.class)
-            "
+            :disabled="!canAssignRole(wowClass, selectedRole)"
             class="p-4 rounded-lg border-2 text-left transition-all duration-200 hover:shadow-md"
             :class="
               selectedClass === wowClass
                 ? 'border-blue-500'
-                : canAssignRole(wowClass, selectedRole) &&
-                    (!isFirstSlot || wowClass === character.class)
+                : canAssignRole(wowClass, selectedRole)
                   ? 'border-gray-300 hover:border-gray-400'
                   : 'border-gray-200 cursor-not-allowed opacity-50'
             "
             :style="{
               backgroundColor: getClassButtonBackground(wowClass),
-              ringColor: wowClass === character.class ? '#EAB308' : 'transparent',
-              ringWidth: wowClass === character.class ? '2px' : '0px',
             }"
           >
             <div class="flex items-center justify-between">
               <h4
                 class="font-bold text-base"
                 :style="{
-                  color:
-                    canAssignRole(wowClass, selectedRole) &&
-                    (!isFirstSlot || wowClass === character.class)
-                      ? '#1F2937'
-                      : '#6B7280',
+                  color: canAssignRole(wowClass, selectedRole) ? '#1F2937' : '#6B7280',
                 }"
               >
                 {{ getClassDisplayName(wowClass) }}
               </h4>
-              <div v-if="wowClass === character.class" class="w-5 h-5 text-amber-500">
-                <svg fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-                  />
-                </svg>
-              </div>
             </div>
-
-            <p
-              v-if="isFirstSlot && wowClass !== character.class"
-              class="text-sm text-amber-600 mt-2 font-medium"
-            >
-              Must use character's class
-            </p>
           </button>
         </div>
       </div>
@@ -311,10 +285,7 @@ const getCurrentTier = () => {
 }
 
 const getClassButtonBackground = (wowClass: string) => {
-  if (
-    !canAssignRole(wowClass as WoWClass, selectedRole.value) ||
-    (props.isFirstSlot && wowClass !== props.character.class)
-  ) {
+  if (!canAssignRole(wowClass as WoWClass, selectedRole.value)) {
     return '#F3F4F6' // gray-100 for disabled
   }
 

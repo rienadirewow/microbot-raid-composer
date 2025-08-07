@@ -307,11 +307,16 @@ const availableClasses = computed(() => {
 
 // Handle class selection
 const handleClassSelect = (wowClass: WoWClass) => {
+  // For character slots (first slot), don't allow changing the class
+  if (props.isFirstSlot) {
+    return
+  }
+
   selectedClass.value = wowClass
-  
+
   // Update role selection based on the new class
   const classRoles = CLASS_ROLE_RESTRICTIONS[wowClass] || []
-  
+
   // If current role is not available for the new class, switch to first available role
   if (!classRoles.includes(selectedRole.value)) {
     if (classRoles.includes('tank')) {

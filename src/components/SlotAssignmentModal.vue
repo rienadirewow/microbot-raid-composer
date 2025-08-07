@@ -165,7 +165,7 @@ const emit = defineEmits<{
 }>()
 
 // State
-const selectedRole = ref<Role>(props.currentSlot?.role || 'dps')
+const selectedRole = ref<Role>(props.currentSlot?.role || getDefaultRole())
 const selectedClass = ref<WoWClass>(
   props.currentSlot?.class || (props.isFirstSlot ? props.character.class : 'warrior'),
 )
@@ -333,6 +333,22 @@ const getDefaultTierType = (): TierType => {
   } else {
     return 'D'
   }
+}
+
+const getDefaultRole = (): Role => {
+  // For character slots, prioritize tank > healer > dps
+  if (props.isFirstSlot) {
+    if (canAssignRole(props.character.class, 'tank')) {
+      return 'tank'
+    } else if (canAssignRole(props.character.class, 'healer')) {
+      return 'healer'
+    } else {
+      return 'dps'
+    }
+  }
+  
+  // For companion slots, default to dps
+  return 'dps'
 }
 
 const selectLicenseType = (type: TierType, tier: TierLevel) => {

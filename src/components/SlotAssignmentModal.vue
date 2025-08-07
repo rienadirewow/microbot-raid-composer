@@ -75,13 +75,14 @@
             class="p-4 rounded-lg border-2 text-left transition-all"
             :class="
               selectedClass === wowClass
-                ? 'bg-blue-50 border-blue-500'
+                ? 'border-blue-500'
                 : canAssignRole(wowClass, selectedRole) &&
                     (!isFirstSlot || wowClass === character.class)
-                  ? 'bg-white border-gray-300 hover:bg-gray-50 hover:border-gray-400'
-                  : 'bg-gray-100 border-gray-200 cursor-not-allowed opacity-50'
+                  ? 'border-gray-300 hover:border-gray-400'
+                  : 'border-gray-200 cursor-not-allowed opacity-50'
             "
             :style="{
+              backgroundColor: getClassButtonBackground(wowClass),
               ringColor: wowClass === character.class ? '#EAB308' : 'transparent',
               ringWidth: wowClass === character.class ? '2px' : '0px',
             }"
@@ -93,7 +94,7 @@
                   color:
                     canAssignRole(wowClass, selectedRole) &&
                     (!isFirstSlot || wowClass === character.class)
-                      ? getClassColor(wowClass)
+                      ? '#1F2937'
                       : '#6B7280',
                 }"
               >
@@ -295,6 +296,21 @@ const getCurrentTier = () => {
   return selectedTierType.value === 'R'
     ? props.character.unlockedTiers.r
     : props.character.unlockedTiers.d
+}
+
+const getClassButtonBackground = (wowClass: string) => {
+  if (!canAssignRole(wowClass as WoWClass, selectedRole.value) || 
+      (props.isFirstSlot && wowClass !== props.character.class)) {
+    return '#F3F4F6' // gray-100 for disabled
+  }
+  
+  if (selectedClass.value === wowClass) {
+    return '#EFF6FF' // blue-50 for selected
+  }
+  
+  // Use class color as background with reduced opacity
+  const classColor = getClassColor(wowClass)
+  return classColor + '20' // Add 20% opacity
 }
 
 const handleAssign = () => {

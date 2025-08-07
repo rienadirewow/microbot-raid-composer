@@ -3,6 +3,7 @@
     @click="$emit('click')"
     class="flex-shrink-0 w-48 h-24 border-2 rounded-lg p-3 transition-all duration-200 cursor-pointer hover:shadow-md"
     :class="slotClasses"
+    :style="{ backgroundColor: getBackgroundColor() }"
   >
     <div class="flex items-start justify-between h-full">
       <div class="flex-1">
@@ -65,10 +66,10 @@ const slotClasses = computed(() => {
   }
 
   if (props.isFirstSlot) {
-    return 'border-green-500 border-4 bg-green-50'
+    return 'border-green-500 border-4'
   }
 
-  return 'border-green-400 bg-white'
+  return 'border-green-400'
 })
 
 const iconClasses = computed(() => {
@@ -141,7 +142,7 @@ const getClassColor = (wowClass: string) => {
     shaman: '#0070DE',
     mage: '#69CCF0',
     warlock: '#9482C9',
-    druid: '#FF7D0A'
+    druid: '#FF7D0A',
   }
   return classColors[wowClass] || '#6B7280'
 }
@@ -151,12 +152,8 @@ const getTierTextColor = () => {
     return '#6B7280' // gray-500 for good contrast on white background
   }
 
-  // For colored backgrounds, use darker text for better contrast
-  if (props.isFirstSlot) {
-    return '#065F46' // green-800 for contrast on green-50 background
-  }
-
-  return '#6B7280' // gray-500 as default
+  // Use darker text for contrast on class-colored backgrounds
+  return '#4B5563' // gray-600 for good contrast
 }
 
 const getTierDisplayName = () => {
@@ -169,22 +166,23 @@ const getTierDisplayName = () => {
   return `${tierName}${typeName} gear`
 }
 
+const getBackgroundColor = () => {
+  if (!props.slot) {
+    return '#FFFFFF' // white background for empty slots
+  }
+
+  // Use class color as background with reduced opacity
+  const classColor = getClassColor(props.slot.class)
+  return classColor + '20' // Add 20% opacity
+}
+
 const getDisplayNameColor = () => {
   if (!props.slot) {
     return '#374151' // gray-700 for good contrast on white background
   }
 
-  // If it's a character slot, use the character's class color
-  if (props.slot.isCharacter && props.slot.characterName) {
-    return getClassColor(props.slot.class)
-  }
-
-  // For assigned slots, use the class color
-  if (props.slot.class) {
-    return getClassColor(props.slot.class)
-  }
-
-  return '#374151' // gray-700 as fallback
+  // Use dark text for contrast on class-colored backgrounds
+  return '#1F2937' // gray-800 for good contrast
 }
 
 const getRoleIcon = () => {

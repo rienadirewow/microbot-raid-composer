@@ -3,11 +3,11 @@
     <div class="space-y-6">
       <!-- License Type Selection -->
       <div>
-        <h3 class="text-xl font-bold text-slate-800 mb-4">Select License Type</h3>
+        <h3 class="text-lg font-bold text-slate-800 mb-3">Select License Type</h3>
         <div class="flex space-x-3">
           <button
             @click="selectedTierType = 'R'"
-            class="flex items-center px-6 py-3 rounded-xl font-semibold transition-all duration-200 hover:shadow-md"
+            class="flex items-center px-4 py-2 rounded-lg font-semibold transition-all duration-200 hover:shadow-md"
             :class="
               selectedTierType === 'R'
                 ? 'bg-blue-600 text-white shadow-lg'
@@ -18,11 +18,11 @@
           </button>
           <button
             @click="selectedTierType = 'D'"
-            class="flex items-center px-6 py-3 rounded-xl font-semibold transition-all duration-200 hover:shadow-md"
+            class="flex items-center px-4 py-2 rounded-lg font-semibold transition-all duration-200 hover:shadow-md"
             :class="
               selectedTierType === 'D'
                 ? 'bg-purple-600 text-white shadow-lg'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-purple-100 text-gray-700 hover:bg-purple-200'
             "
           >
             Dungeon License (T{{ character.unlockedTiers.d }})
@@ -32,13 +32,13 @@
 
       <!-- Role Selection -->
       <div>
-        <h3 class="text-xl font-bold text-slate-800 mb-4">Select Role</h3>
+        <h3 class="text-lg font-bold text-slate-800 mb-3">Select Role</h3>
         <div class="flex space-x-3">
           <button
             v-for="roleButton in roleButtons"
             :key="roleButton.role"
             @click="selectedRole = roleButton.role"
-            class="flex items-center px-6 py-3 rounded-xl font-semibold transition-all duration-200 hover:shadow-md border-2"
+            class="flex items-center px-4 py-2 rounded-lg font-semibold transition-all duration-200 hover:shadow-md border-2"
             :class="
               selectedRole === roleButton.role
                 ? 'bg-blue-50 border-blue-500 text-blue-700'
@@ -60,10 +60,10 @@
 
       <!-- Class Selection -->
       <div>
-        <h3 class="text-xl font-bold text-slate-800 mb-4">
+        <h3 class="text-lg font-bold text-slate-800 mb-3">
           Select Class {{ isFirstSlot ? '(Character Class)' : '' }}
         </h3>
-        <div class="grid grid-cols-3 gap-4">
+        <div class="grid grid-cols-3 gap-3">
           <button
             v-for="wowClass in availableClasses"
             :key="wowClass"
@@ -72,7 +72,7 @@
               !canAssignRole(wowClass, selectedRole) ||
               (isFirstSlot && wowClass !== character.class)
             "
-            class="p-6 rounded-xl border-2 text-left transition-all duration-200 hover:shadow-md"
+            class="p-4 rounded-lg border-2 text-left transition-all duration-200 hover:shadow-md"
             :class="
               selectedClass === wowClass
                 ? 'border-blue-500'
@@ -108,7 +108,10 @@
                 </svg>
               </div>
             </div>
-            <p v-if="!canAssignRole(wowClass, selectedRole)" class="text-sm text-red-600 mt-2 font-medium">
+            <p
+              v-if="!canAssignRole(wowClass, selectedRole)"
+              class="text-sm text-red-600 mt-2 font-medium"
+            >
               Cannot be {{ getRoleDisplayName(selectedRole) }}
             </p>
             <p
@@ -122,12 +125,14 @@
       </div>
 
       <!-- Tier Info -->
-      <div class="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl p-6 border border-slate-200">
+      <div class="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg p-4 border border-slate-200">
         <p class="text-base text-slate-700 font-medium">
           <strong>Selected Gear Tier:</strong> T{{ getCurrentTier() }}{{ selectedTierType }}
           {{ isFirstSlot ? ' (Character tier)' : ' (Inherited from character)' }}
         </p>
-        <p class="text-base text-slate-700 font-medium mt-2"><strong>Faction:</strong> {{ character.faction }}</p>
+        <p class="text-base text-slate-700 font-medium mt-2">
+          <strong>Faction:</strong> {{ character.faction }}
+        </p>
         <p v-if="isFirstSlot" class="text-base text-slate-700 font-medium mt-2">
           <strong>Type:</strong> Control Member
         </p>
@@ -135,7 +140,7 @@
     </div>
 
     <!-- Actions -->
-    <div class="flex justify-between pt-8 border-t border-slate-200">
+    <div class="flex justify-between pt-6 border-t border-slate-200">
       <Button v-if="currentSlot" type="button" variant="danger" size="sm" @click="handleClearSlot">
         Clear Slot
       </Button>
@@ -198,11 +203,23 @@ const modalTitle = computed(() => {
   return `Configure ${props.isFirstSlot ? props.character.name : `${props.character.name}'s Group Member`}`
 })
 
-const roleButtons = computed(() => [
-  { role: 'tank' as Role, icon: 'ShieldIcon', color: '#3B82F6' },
-  { role: 'healer' as Role, icon: 'HeartIcon', color: '#10B981' },
-  { role: 'dps' as Role, icon: 'SwordIcon', color: '#EF4444' },
-])
+const roleButtons = computed(() => {
+  const baseRoles = [
+    { role: 'tank' as Role, icon: 'ShieldIcon', color: '#3B82F6' },
+    { role: 'healer' as Role, icon: 'HeartIcon', color: '#10B981' },
+    { role: 'dps' as Role, icon: 'SwordIcon', color: '#EF4444' },
+  ]
+
+  // For lite characters (non-control members), only allow applicable roles
+  if (!props.isFirstSlot) {
+    return baseRoles.filter(roleButton => {
+      // Check if the character's class can fulfill this role
+      return canAssignRole(props.character.class, roleButton.role)
+    })
+  }
+
+  return baseRoles
+})
 
 const availableClasses = computed(() => {
   const allClasses: WoWClass[] = [

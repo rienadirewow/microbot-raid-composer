@@ -1,11 +1,15 @@
 <template>
-  <div class="bg-white rounded-xl shadow-md border border-slate-200 p-6 hover:shadow-lg transition-shadow">
-    <div class="flex items-center mb-4">
-      <h3 class="text-xl font-bold text-slate-800">{{ row.character.name }}'s Group</h3>
-      <span class="ml-3 text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">T{{ row.character.unlockedTiers.r }}R gear</span>
+  <div
+    class="bg-white rounded-xl shadow-md border border-slate-200 p-4 hover:shadow-lg transition-shadow"
+  >
+    <div class="flex items-center mb-3">
+      <h3 class="text-lg font-bold text-slate-800">{{ row.character.name }}'s Group</h3>
+      <span class="ml-3 text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full"
+        >T{{ row.character.unlockedTiers.r }}R gear</span
+      >
     </div>
 
-    <div class="grid grid-cols-5 gap-4">
+    <div class="grid grid-cols-5 gap-3">
       <RaidSlot
         v-for="(slot, slotIndex) in row.slots"
         :key="slotIndex"

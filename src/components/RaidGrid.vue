@@ -1,12 +1,12 @@
 <template>
   <div class="p-0">
-    <div class="mb-8">
-      <h2 class="text-3xl font-bold text-slate-800 mb-3">Raid Composition</h2>
-      <p class="text-slate-600 text-lg">Each row represents a character and their group members</p>
+    <div class="mb-6">
+      <h2 class="text-2xl font-bold text-slate-800 mb-2">Raid Composition</h2>
+      <p class="text-slate-600">Each row represents a character and their group members</p>
 
       <div
         v-if="currentPlayer"
-        class="mt-6 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-6 shadow-sm"
+        class="mt-4 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-4 shadow-sm"
       >
         <div class="flex items-center">
           <div class="w-8 h-8 text-amber-500 mr-4">
@@ -32,7 +32,7 @@
       </div>
     </div>
 
-    <div class="space-y-6">
+    <div class="space-y-4">
       <RaidRow
         v-for="(row, rowIndex) in composition"
         :key="row.character.id"

@@ -1,7 +1,7 @@
 <template>
   <div
     @click="$emit('click')"
-    class="flex-shrink-0 w-52 h-28 border-2 rounded-xl p-4 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-105"
+    class="flex-shrink-0 w-48 h-24 border rounded-xl p-3 transition-all duration-200 cursor-pointer hover:shadow-md"
     :class="slotClasses"
     :style="{ backgroundColor: getBackgroundColor() }"
   >
@@ -66,10 +66,20 @@ const slotClasses = computed(() => {
   }
 
   if (props.isFirstSlot) {
-    return 'border-green-500 border-4'
+    // Use tier-related colors for first slot
+    if (props.slot.tierType === 'R') {
+      return 'border-blue-500 border-2'
+    } else {
+      return 'border-purple-500 border-2'
+    }
   }
 
-  return 'border-green-400'
+  // Use tier-related colors for other slots
+  if (props.slot.tierType === 'R') {
+    return 'border-blue-400'
+  } else {
+    return 'border-purple-400'
+  }
 })
 
 const iconClasses = computed(() => {

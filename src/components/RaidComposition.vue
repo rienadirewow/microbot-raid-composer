@@ -1,5 +1,7 @@
 <template>
-  <div class="bg-gradient-to-br from-slate-50 to-white rounded-xl shadow-lg border border-slate-200 p-8">
+  <div
+    class="bg-gradient-to-br from-slate-50 to-white rounded-xl shadow-lg border border-slate-200 p-6"
+  >
     <RaidGrid :composition="composition" :characters="characters" @slot-click="handleSlotClick" />
 
     <SlotAssignmentModal

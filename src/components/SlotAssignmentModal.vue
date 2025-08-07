@@ -497,6 +497,24 @@ const handleClearSlot = () => {
   emit('close')
 }
 
+// Watch for modal props changes to reset state
+watch(
+  [() => props.isOpen, () => props.currentSlot, () => props.isFirstSlot, () => props.character],
+  () => {
+    if (props.isOpen) {
+      // Reset modal state when opening
+      selectedRole.value = props.currentSlot?.role || getDefaultRole()
+      selectedClass.value = props.currentSlot?.class || (props.isFirstSlot ? props.character.class : 'warrior')
+      selectedTierType.value = props.currentSlot?.tierType || getDefaultTierType()
+      selectedLicenseType.value = {
+        type: props.currentSlot?.tierType || 'R',
+        tier: props.currentSlot?.tier || getHighestAvailableTier(),
+      }
+    }
+  },
+  { immediate: true }
+)
+
 // Simple icon render functions
 const ShieldIcon = () =>
   h('svg', { class: 'h-4 w-4', fill: 'currentColor', viewBox: '0 0 20 20' }, [

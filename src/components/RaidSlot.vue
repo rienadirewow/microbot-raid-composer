@@ -1,27 +1,27 @@
 <template>
   <div
     @click="$emit('click')"
-    class="flex-shrink-0 w-48 h-24 border-2 rounded-lg p-3 transition-all duration-200 cursor-pointer hover:shadow-md"
+    class="flex-shrink-0 w-52 h-28 border-2 rounded-xl p-4 transition-all duration-300 cursor-pointer hover:shadow-lg hover:scale-105"
     :class="slotClasses"
     :style="{ backgroundColor: getBackgroundColor() }"
   >
     <div class="flex items-start justify-between h-full">
       <div class="flex-1">
-        <div class="font-medium" :style="{ color: getDisplayNameColor() }">
+        <div class="font-semibold text-lg" :style="{ color: getDisplayNameColor() }">
           {{ displayName }}
         </div>
         <div
           v-if="slot?.role"
-          class="inline-block px-2 py-1 text-xs rounded-full mt-1"
+          class="inline-block px-3 py-1 text-sm font-medium rounded-full mt-2"
           :class="getRoleBadgeClass(slot.role)"
         >
           {{ getRoleDisplayName(slot.role) }}
         </div>
-        <div class="text-xs mt-1" :style="{ color: getTierTextColor() }">
+        <div class="text-sm mt-2 font-medium" :style="{ color: getTierTextColor() }">
           {{ getTierDisplayName() }}
         </div>
       </div>
-      <div class="w-4 h-4" :class="iconClasses">
+      <div class="w-6 h-6" :class="iconClasses">
         <component :is="getRoleIcon()" />
       </div>
     </div>
@@ -88,15 +88,15 @@ const iconClasses = computed(() => {
 const getRoleBadgeClass = (role: Role) => {
   switch (role) {
     case 'tank':
-      return 'bg-blue-100 text-blue-800'
+      return 'bg-blue-100 text-blue-800 border border-blue-200'
     case 'healer':
-      return 'bg-green-100 text-green-800'
+      return 'bg-green-100 text-green-800 border border-green-200'
     case 'mdps':
     case 'rdps':
     case 'dps':
-      return 'bg-red-100 text-red-800'
+      return 'bg-red-100 text-red-800 border border-red-200'
     default:
-      return 'bg-gray-100 text-gray-800'
+      return 'bg-gray-100 text-gray-800 border border-gray-200'
   }
 }
 

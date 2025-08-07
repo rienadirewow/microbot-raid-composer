@@ -1,10 +1,6 @@
 <template>
-  <div class="bg-white rounded-lg shadow p-6">
-    <RaidGrid
-      :composition="composition"
-      :characters="characters"
-      @slot-click="handleSlotClick"
-    />
+  <div class="bg-gradient-to-br from-slate-50 to-white rounded-xl shadow-lg border border-slate-200 p-8">
+    <RaidGrid :composition="composition" :characters="characters" @slot-click="handleSlotClick" />
 
     <SlotAssignmentModal
       :is-open="assignmentModal.isOpen"
@@ -47,7 +43,7 @@ const assignmentModal = ref<{
 }>({
   isOpen: false,
   rowIndex: 0,
-  slotIndex: 0
+  slotIndex: 0,
 })
 
 // Computed
@@ -63,13 +59,16 @@ const currentCharacter = computed(() => {
 
 // Methods
 const initializeCharacterGroups = () => {
-  composition.value = props.characters.map(character => {
+  composition.value = props.characters.map((character) => {
     const slots: (PlayerSlot | null)[] = Array(5).fill(null)
-    
+
     // Auto-assign first slot with character's class and default role
-    const defaultRole: Role = canAssignRole(character.class, 'tank') ? 'tank' : 
-                           canAssignRole(character.class, 'healer') ? 'healer' : 'dps'
-    
+    const defaultRole: Role = canAssignRole(character.class, 'tank')
+      ? 'tank'
+      : canAssignRole(character.class, 'healer')
+        ? 'healer'
+        : 'dps'
+
     slots[0] = {
       class: character.class,
       role: defaultRole,
@@ -77,12 +76,12 @@ const initializeCharacterGroups = () => {
       tierType: 'R',
       isCharacter: true,
       characterName: character.name,
-      isControlMember: true
+      isControlMember: true,
     }
-    
+
     return {
       character,
-      slots
+      slots,
     }
   })
 }
@@ -102,7 +101,7 @@ const handleSlotClick = (rowIndex: number, slotIndex: number) => {
   assignmentModal.value = {
     isOpen: true,
     rowIndex,
-    slotIndex
+    slotIndex,
   }
 }
 
@@ -113,10 +112,11 @@ const closeAssignmentModal = () => {
 const handleAssignSlot = (wowClass: WoWClass, role: Role, tierType: TierType) => {
   const row = composition.value[assignmentModal.value.rowIndex]
   if (!row) return
-  
+
   const isFirstSlot = assignmentModal.value.slotIndex === 0
-  const selectedTier = tierType === 'R' ? row.character.unlockedTiers.r : row.character.unlockedTiers.d
-  
+  const selectedTier =
+    tierType === 'R' ? row.character.unlockedTiers.r : row.character.unlockedTiers.d
+
   const newSlot: PlayerSlot = {
     class: wowClass,
     role,
@@ -124,11 +124,11 @@ const handleAssignSlot = (wowClass: WoWClass, role: Role, tierType: TierType) =>
     tierType,
     isCharacter: isFirstSlot,
     characterName: isFirstSlot ? row.character.name : undefined,
-    isControlMember: row.character.name === 'Current Player'
+    isControlMember: row.character.name === 'Current Player',
   }
-  
+
   row.slots[assignmentModal.value.slotIndex] = newSlot
-  
+
   // Emit update
   emit('update-composition', composition.value)
 }
@@ -136,9 +136,9 @@ const handleAssignSlot = (wowClass: WoWClass, role: Role, tierType: TierType) =>
 const handleClearSlot = () => {
   const row = composition.value[assignmentModal.value.rowIndex]
   if (!row) return
-  
+
   row.slots[assignmentModal.value.slotIndex] = null
-  
+
   // Emit update
   emit('update-composition', composition.value)
 }

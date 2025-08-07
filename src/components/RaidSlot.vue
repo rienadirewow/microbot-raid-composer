@@ -12,7 +12,7 @@
         </div>
         <div
           v-if="slot?.role"
-          class="inline-block px-2 py-0.5 text-xs font-medium rounded-full mt-1"
+          class="inline-block px-1.5 py-0.5 text-xs font-medium rounded-full mt-1"
           :class="getRoleBadgeClass(slot.role)"
         >
           {{ getRoleDisplayName(slot.role) }}

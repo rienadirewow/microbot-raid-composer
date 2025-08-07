@@ -165,6 +165,26 @@ const emit = defineEmits<{
 }>()
 
 // Helper functions (defined before use)
+const canAssignRole = (wowClass: WoWClass, role: Role): boolean => {
+  const allowedRoles = CLASS_ROLE_RESTRICTIONS[wowClass]
+  if (!allowedRoles) return false
+
+  // Map our role types to the restrictions
+  if (role === 'dps') {
+    return (
+      allowedRoles.includes('dps') || allowedRoles.includes('mdps') || allowedRoles.includes('rdps')
+    )
+  }
+  if (role === 'mdps') {
+    return allowedRoles.includes('mdps') || allowedRoles.includes('dps')
+  }
+  if (role === 'rdps') {
+    return allowedRoles.includes('rdps') || allowedRoles.includes('dps')
+  }
+
+  return allowedRoles.includes(role)
+}
+
 const getDefaultRole = (): Role => {
   // For character slots, prioritize tank > healer > dps
   if (props.isFirstSlot) {
@@ -176,7 +196,7 @@ const getDefaultRole = (): Role => {
       return 'dps'
     }
   }
-  
+
   // For companion slots, default to dps
   return 'dps'
 }
@@ -274,25 +294,6 @@ const availableDungeonTiers = computed(() => {
 })
 
 // Methods
-const canAssignRole = (wowClass: WoWClass, role: Role): boolean => {
-  const allowedRoles = CLASS_ROLE_RESTRICTIONS[wowClass]
-  if (!allowedRoles) return false
-
-  // Map our role types to the restrictions
-  if (role === 'dps') {
-    return (
-      allowedRoles.includes('dps') || allowedRoles.includes('mdps') || allowedRoles.includes('rdps')
-    )
-  }
-  if (role === 'mdps') {
-    return allowedRoles.includes('mdps') || allowedRoles.includes('dps')
-  }
-  if (role === 'rdps') {
-    return allowedRoles.includes('rdps') || allowedRoles.includes('dps')
-  }
-
-  return allowedRoles.includes(role)
-}
 
 const getRoleDisplayName = (role: Role) => {
   switch (role) {
@@ -351,8 +352,6 @@ const getCurrentTier = () => {
   // For group members, use the selected license type
   return selectedLicenseType.value.tier
 }
-
-
 
 const selectLicenseType = (type: TierType, tier: TierLevel) => {
   selectedLicenseType.value = { type, tier }

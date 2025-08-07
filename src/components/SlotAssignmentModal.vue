@@ -69,7 +69,7 @@
           <button
             v-for="wowClass in availableClasses"
             :key="wowClass"
-            @click="selectedClass = wowClass"
+            @click="handleClassSelect(wowClass)"
             :disabled="!canAssignRole(wowClass, selectedRole)"
             class="p-4 rounded-lg border-2 text-left transition-all duration-200 hover:shadow-md"
             :class="
@@ -240,7 +240,7 @@ const roleButtons = computed(() => {
   if (props.isFirstSlot) {
     const characterClass = props.character.class
     const allowedRoles = CLASS_ROLE_RESTRICTIONS[characterClass] || []
- 
+
     return allowedRoles.map((role) => {
       switch (role) {
         case 'tank':
@@ -261,15 +261,15 @@ const roleButtons = computed(() => {
 
   // For companion/group member slots, show dynamic roles based on selected class
   const selectedClassRoles = CLASS_ROLE_RESTRICTIONS[selectedClass.value] || []
-  
+
   // If the selected class has specific dps roles (mdps/rdps), show those instead of generic dps
   const hasSpecificDps = selectedClassRoles.includes('mdps') || selectedClassRoles.includes('rdps')
-  
+
   const baseRoles = [
     { role: 'tank' as Role, icon: ShieldIcon, color: '#3B82F6' },
     { role: 'healer' as Role, icon: HeartIcon, color: '#10B981' },
   ]
-  
+
   // Add appropriate dps role(s)
   if (hasSpecificDps) {
     if (selectedClassRoles.includes('mdps')) {
@@ -281,7 +281,7 @@ const roleButtons = computed(() => {
   } else {
     baseRoles.push({ role: 'dps' as Role, icon: SwordIcon, color: '#EF4444' })
   }
-  
+
   return baseRoles
 })
 
@@ -305,7 +305,38 @@ const availableClasses = computed(() => {
   })
 })
 
-// Watch for class changes to update role selection
+// Handle class selection
+const handleClassSelect = (wowClass: WoWClass) => {
+  selectedClass.value = wowClass
+  
+  // Update role selection based on the new class
+  const classRoles = CLASS_ROLE_RESTRICTIONS[wowClass] || []
+  
+  // If current role is not available for the new class, switch to first available role
+  if (!classRoles.includes(selectedRole.value)) {
+    if (classRoles.includes('tank')) {
+      selectedRole.value = 'tank'
+    } else if (classRoles.includes('healer')) {
+      selectedRole.value = 'healer'
+    } else if (classRoles.includes('mdps')) {
+      selectedRole.value = 'mdps'
+    } else if (classRoles.includes('rdps')) {
+      selectedRole.value = 'rdps'
+    } else if (classRoles.includes('dps')) {
+      selectedRole.value = 'dps'
+    }
+  }
+  // If current role is 'dps' but the new class has specific dps roles, switch to the first available
+  else if (selectedRole.value === 'dps') {
+    if (classRoles.includes('mdps')) {
+      selectedRole.value = 'mdps'
+    } else if (classRoles.includes('rdps')) {
+      selectedRole.value = 'rdps'
+    }
+  }
+}
+
+// Watch for class changes to update role selection (fallback)
 watch(selectedClass, (newClass) => {
   // If current role is 'dps' but the new class has specific dps roles, switch to the first available
   if (selectedRole.value === 'dps') {

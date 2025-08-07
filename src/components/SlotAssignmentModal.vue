@@ -6,36 +6,30 @@
         <h3 class="text-lg font-bold text-slate-800 mb-3">Select License Type</h3>
         <div class="space-y-3">
           <!-- Raid tiers -->
-          <div>
-            <h4 class="text-sm font-medium text-slate-700 mb-2">Raid Licenses</h4>
-            <div class="grid grid-cols-6 gap-1">
-              <button
-                v-for="tier in [0, 1, 2, 3, 4, 5]"
-                :key="`R${tier}`"
-                @click="selectLicenseType('R', tier as TierLevel)"
-                :disabled="!availableRaidTiers.includes(tier as TierLevel)"
-                class="flex items-center justify-center px-2 py-1 border rounded cursor-pointer transition-colors text-xs"
-                :class="getLicenseTypeButtonClass('R', tier as TierLevel)"
-              >
-                T{{ tier }}R
-              </button>
-            </div>
+          <div class="grid grid-cols-6 gap-1">
+            <button
+              v-for="tier in [0, 1, 2, 3, 4, 5]"
+              :key="`R${tier}`"
+              @click="selectLicenseType('R', tier as TierLevel)"
+              :disabled="!availableRaidTiers.includes(tier as TierLevel)"
+              class="flex items-center justify-center px-2 py-1 border rounded cursor-pointer transition-colors text-xs"
+              :class="getLicenseTypeButtonClass('R', tier as TierLevel)"
+            >
+              T{{ tier }}R
+            </button>
           </div>
           <!-- Dungeon tiers -->
-          <div>
-            <h4 class="text-sm font-medium text-slate-700 mb-2">Dungeon Licenses</h4>
-            <div class="grid grid-cols-6 gap-1">
-              <button
-                v-for="tier in [0, 1, 2, 3, 4, 5]"
-                :key="`D${tier}`"
-                @click="selectLicenseType('D', tier as TierLevel)"
-                :disabled="!availableDungeonTiers.includes(tier as TierLevel)"
-                class="flex items-center justify-center px-2 py-1 border rounded cursor-pointer transition-colors text-xs"
-                :class="getLicenseTypeButtonClass('D', tier as TierLevel)"
-              >
-                T{{ tier }}D
-              </button>
-            </div>
+          <div class="grid grid-cols-6 gap-1">
+            <button
+              v-for="tier in [0, 1, 2, 3, 4, 5]"
+              :key="`D${tier}`"
+              @click="selectLicenseType('D', tier as TierLevel)"
+              :disabled="!availableDungeonTiers.includes(tier as TierLevel)"
+              class="flex items-center justify-center px-2 py-1 border rounded cursor-pointer transition-colors text-xs"
+              :class="getLicenseTypeButtonClass('D', tier as TierLevel)"
+            >
+              T{{ tier }}D
+            </button>
           </div>
         </div>
       </div>

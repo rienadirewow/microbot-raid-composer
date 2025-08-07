@@ -122,6 +122,12 @@ export const useRaidsStore = defineStore('raids', () => {
     return false
   }
 
+  // Delete current raid
+  const deleteCurrentRaid = async () => {
+    if (!currentRaid.value) return false
+    return await deleteRaid(currentRaid.value.id)
+  }
+
   // Generate export string for the current raid
   const generateExportString = () => {
     if (!currentRaid.value) return ''
@@ -170,6 +176,7 @@ export const useRaidsStore = defineStore('raids', () => {
     saveCurrentRaid,
     loadRaid,
     deleteRaid,
+    deleteCurrentRaid,
     generateExportString,
 
     // Computed

@@ -16,6 +16,7 @@
       @save="saveCurrentRaid"
       @export="exportRaid"
       @clear="clearCurrentRaid"
+      @delete="deleteCurrentRaid"
     />
 
     <!-- Raid Composition -->
@@ -111,6 +112,12 @@ const exportRaid = () => {
 const clearCurrentRaid = () => {
   if (confirm('Are you sure you want to clear the current raid? This action cannot be undone.')) {
     raidsStore.currentRaid = null
+  }
+}
+
+const deleteCurrentRaid = () => {
+  if (confirm('Are you sure you want to delete this raid? This action cannot be undone.')) {
+    raidsStore.deleteCurrentRaid()
   }
 }
 

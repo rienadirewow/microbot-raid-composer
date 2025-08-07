@@ -4,27 +4,39 @@
       <!-- License Type Selection - Only show for non-first slots -->
       <div v-if="!isFirstSlot">
         <h3 class="text-lg font-bold text-slate-800 mb-3">Select License Type</h3>
-        <div class="grid grid-cols-6 gap-1">
+        <div class="space-y-3">
           <!-- Raid tiers -->
-          <button
-            v-for="tier in availableRaidTiers"
-            :key="`R${tier}`"
-            @click="selectLicenseType('R', tier)"
-            class="flex items-center justify-center px-2 py-1 border rounded cursor-pointer transition-colors text-xs"
-            :class="getLicenseTypeButtonClass('R', tier)"
-          >
-            T{{ tier }}R
-          </button>
+          <div>
+            <h4 class="text-sm font-medium text-slate-700 mb-2">Raid Licenses</h4>
+            <div class="grid grid-cols-6 gap-1">
+              <button
+                v-for="tier in [0, 1, 2, 3, 4, 5]"
+                :key="`R${tier}`"
+                @click="selectLicenseType('R', tier as TierLevel)"
+                :disabled="!availableRaidTiers.includes(tier as TierLevel)"
+                class="flex items-center justify-center px-2 py-1 border rounded cursor-pointer transition-colors text-xs"
+                :class="getLicenseTypeButtonClass('R', tier as TierLevel)"
+              >
+                T{{ tier }}R
+              </button>
+            </div>
+          </div>
           <!-- Dungeon tiers -->
-          <button
-            v-for="tier in availableDungeonTiers"
-            :key="`D${tier}`"
-            @click="selectLicenseType('D', tier)"
-            class="flex items-center justify-center px-2 py-1 border rounded cursor-pointer transition-colors text-xs"
-            :class="getLicenseTypeButtonClass('D', tier)"
-          >
-            T{{ tier }}D
-          </button>
+          <div>
+            <h4 class="text-sm font-medium text-slate-700 mb-2">Dungeon Licenses</h4>
+            <div class="grid grid-cols-6 gap-1">
+              <button
+                v-for="tier in [0, 1, 2, 3, 4, 5]"
+                :key="`D${tier}`"
+                @click="selectLicenseType('D', tier as TierLevel)"
+                :disabled="!availableDungeonTiers.includes(tier as TierLevel)"
+                class="flex items-center justify-center px-2 py-1 border rounded cursor-pointer transition-colors text-xs"
+                :class="getLicenseTypeButtonClass('D', tier as TierLevel)"
+              >
+                T{{ tier }}D
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -313,6 +325,9 @@ const selectLicenseType = (type: TierType, tier: TierLevel) => {
 const getLicenseTypeButtonClass = (type: TierType, tier: TierLevel) => {
   const isSelected =
     selectedLicenseType.value.type === type && selectedLicenseType.value.tier === tier
+  const isAvailable = type === 'R' 
+    ? availableRaidTiers.value.includes(tier)
+    : availableDungeonTiers.value.includes(tier)
 
   // Get tier color based on WoW gear quality colors
   const getTierColor = (tier: TierLevel) => {
@@ -334,10 +349,14 @@ const getLicenseTypeButtonClass = (type: TierType, tier: TierLevel) => {
     }
   }
 
+  if (!isAvailable) {
+    return 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-50'
+  }
+
   if (isSelected) {
-    return `font-bold ${getTierColor(tier)} border-2`
+    return `font-bold ${getTierColor(tier)} border-3 shadow-lg scale-105`
   } else {
-    return `font-bold ${getTierColor(tier)} hover:opacity-80`
+    return `font-bold ${getTierColor(tier)} hover:opacity-80 hover:scale-105 transition-transform`
   }
 }
 

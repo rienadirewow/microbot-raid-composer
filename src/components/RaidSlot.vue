@@ -52,11 +52,11 @@ const emit = defineEmits<{
 // Computed
 const displayName = computed(() => {
   if (!props.slot) {
-    return props.isFirstSlot ? `${props.character.name}-lite` : 'Group Member'
+    return props.isFirstSlot ? `${props.character.name.toUpperCase()}-lite` : 'Group Member'
   }
 
   if (props.slot.isCharacter && props.slot.characterName) {
-    return props.slot.characterName
+    return props.slot.characterName.toUpperCase()
   }
 
   return getClassDisplayName(props.slot.class)

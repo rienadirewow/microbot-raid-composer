@@ -3,7 +3,7 @@
     class="bg-white rounded-xl shadow-md border border-slate-200 p-4 hover:shadow-lg transition-shadow"
   >
     <div class="flex items-center mb-3">
-      <h3 class="text-lg font-bold text-slate-800">{{ row.character.name }}'s Group</h3>
+      <h3 class="text-lg font-bold text-slate-800">{{ row.character.name.toUpperCase() }}'s Group</h3>
       <span class="ml-3 text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full"
         >T{{ row.character.unlockedTiers.r }}R gear</span
       >

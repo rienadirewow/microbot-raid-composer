@@ -67,23 +67,23 @@ const slotClasses = computed(() => {
     return 'border-dashed border-gray-300 bg-white hover:border-gray-400'
   }
 
-  // Get tier level color based on tier level (0-5)
+  // Get tier level color based on tier level (0-5) - matching TierSelector colors
   const getTierBorderColor = (tier: number) => {
     switch (tier) {
       case 0:
-        return 'border-gray-400'
+        return 'border-gray-500' // Grey
       case 1:
-        return 'border-gray-200'
+        return 'border-gray-500' // White
       case 2:
-        return 'border-blue-400'
+        return 'border-green-400' // Green
       case 3:
-        return 'border-purple-400'
+        return 'border-blue-400' // Blue
       case 4:
-        return 'border-orange-400'
+        return 'border-purple-400' // Purple
       case 5:
-        return 'border-orange-500'
+        return 'border-orange-400' // Orange
       default:
-        return 'border-gray-400'
+        return 'border-gray-500'
     }
   }
 

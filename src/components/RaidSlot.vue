@@ -181,9 +181,9 @@ const getBackgroundColor = () => {
     return '#FFFFFF' // white background for empty slots
   }
 
-  // Use class color as background with reduced opacity
+  // Use class color as background with higher opacity for better visibility
   const classColor = getClassColor(props.slot.class)
-  return classColor + '20' // Add 20% opacity
+  return classColor + '40' // Add 40% opacity
 }
 
 const getDisplayNameColor = () => {

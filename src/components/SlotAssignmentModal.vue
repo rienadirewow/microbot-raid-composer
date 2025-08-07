@@ -169,12 +169,12 @@ const selectedRole = ref<Role>(props.currentSlot?.role || 'dps')
 const selectedClass = ref<WoWClass>(
   props.currentSlot?.class || (props.isFirstSlot ? props.character.class : 'warrior'),
 )
-const selectedTierType = ref<TierType>(props.currentSlot?.tierType || 'R')
+const selectedTierType = ref<TierType>(props.currentSlot?.tierType || getDefaultTierType())
 
 // License type selection state
 const selectedLicenseType = ref<{ type: TierType; tier: TierLevel }>({
   type: props.currentSlot?.tierType || 'R',
-  tier: props.currentSlot?.tier || 0,
+  tier: props.currentSlot?.tier || getHighestAvailableTier(),
 })
 
 // Computed
@@ -314,6 +314,25 @@ const getCurrentTier = () => {
 
   // For group members, use the selected license type
   return selectedLicenseType.value.tier
+}
+
+const getHighestAvailableTier = (): TierLevel => {
+  // For first slot (character), use the character's highest tier
+  if (props.isFirstSlot) {
+    return Math.max(props.character.unlockedTiers.r, props.character.unlockedTiers.d) as TierLevel
+  }
+
+  // For group members, use the character's highest tier as default
+  return Math.max(props.character.unlockedTiers.r, props.character.unlockedTiers.d) as TierLevel
+}
+
+const getDefaultTierType = (): TierType => {
+  // Default to the license type with the higher tier
+  if (props.character.unlockedTiers.r >= props.character.unlockedTiers.d) {
+    return 'R'
+  } else {
+    return 'D'
+  }
 }
 
 const selectLicenseType = (type: TierType, tier: TierLevel) => {

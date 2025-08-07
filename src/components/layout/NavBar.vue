@@ -178,9 +178,7 @@ const raidsStore = useRaidsStore()
 const { supabaseClient, supabaseUser } = useSupabase()
 
 // Watch for user state changes
-watch(supabaseUser, (user) => {
-  console.log('NavBar: User state changed:', user?.email || 'null')
-})
+watch(supabaseUser, (user) => {})
 
 // Methods
 const handleAnonymousSignUp = async () => {
@@ -196,15 +194,7 @@ const handleAnonymousSignUp = async () => {
     const currentUser = supabaseUser.value
     const isAnonymous = currentUser?.is_anonymous === true
 
-    console.log('Current user for sign up:', {
-      id: currentUser?.id,
-      email: currentUser?.email,
-      isAnonymous: currentUser?.is_anonymous,
-    })
-
     if (isAnonymous) {
-      console.log('Anonymous user signing up, using Supabase user linking...')
-
       // Use updateUser to link email to anonymous account
       const { data: updateData, error: updateError } = await supabaseClient.auth.updateUser({
         email: signUpForm.value.email,
@@ -216,17 +206,12 @@ const handleAnonymousSignUp = async () => {
         return
       }
 
-      console.log('Email verification sent successfully')
       alert(
         'Please check your email and click the verification link to complete your account setup.',
       )
 
       // Data should be preserved since it's the same user ID
-      console.log('User ID preserved:', currentUser.id)
-      console.log('All data will be automatically preserved')
     } else {
-      console.log('Non-anonymous user, creating new account...')
-
       // Create new account (this will lose any existing data)
       const { data, error } = await supabaseClient.auth.signUp({
         email: signUpForm.value.email,
@@ -239,7 +224,6 @@ const handleAnonymousSignUp = async () => {
         return
       }
 
-      console.log('Account created successfully')
       alert(
         'Please check your email and click the verification link to complete your account setup.',
       )
@@ -257,32 +241,18 @@ const handleAnonymousSignUp = async () => {
 }
 
 const handleAuthStateChange = async (event: string, session: any) => {
-  console.log('Auth state change from NavBar modal:', event, session)
-  console.log('Current supabaseUser:', supabaseUser.value)
-  console.log('Session user:', session?.user)
-
   if (event === 'SIGNED_IN') {
     // Check if this is a new sign-up from an anonymous user
     const currentUser = supabaseUser.value
     const wasAnonymous = currentUser?.is_anonymous === true
     const isNewUser = session?.user?.id !== currentUser?.id
 
-    console.log('Auth state change details:', {
-      wasAnonymous,
-      isNewUser,
-      currentUserId: currentUser?.id,
-      sessionUserId: session?.user?.id,
-    })
-
     if (wasAnonymous && isNewUser) {
-      console.log('Anonymous user signing up, storing data for migration...')
-
       // Store the current user's data before the auth state changes
       const anonymousCharacters = [...charactersStore.characters]
       const anonymousRaids = [...raidsStore.raids]
 
-      console.log('Current characters:', anonymousCharacters.length)
-      console.log('Current raids:', anonymousRaids.length)
+
 
       // Store this data temporarily to migrate after the user change
       if (anonymousCharacters.length > 0 || anonymousRaids.length > 0) {
@@ -295,13 +265,10 @@ const handleAuthStateChange = async (event: string, session: any) => {
           }),
         )
 
-        console.log('Stored anonymous data for migration:', {
-          characters: anonymousCharacters.length,
-          raids: anonymousRaids.length,
-        })
+
       }
     } else {
-      console.log('This appears to be a sign-in, not a new sign-up from anonymous user')
+
     }
 
     showSignUpModal.value = false
@@ -310,35 +277,26 @@ const handleAuthStateChange = async (event: string, session: any) => {
 
 // Watch for user changes to detect when email verification is completed
 watch(supabaseUser, async (newUser, oldUser) => {
-  console.log('User state changed:', {
-    oldUser: oldUser?.id,
-    newUser: newUser?.id,
-    oldEmail: oldUser?.email,
-    newEmail: newUser?.email,
-    oldIsAnonymous: oldUser?.is_anonymous,
-    newIsAnonymous: newUser?.is_anonymous,
-  })
+
 
   // Check if user just completed email verification (went from anonymous to permanent)
   if (oldUser?.is_anonymous && !newUser?.is_anonymous && newUser?.email) {
-    console.log('Anonymous user completed email verification!')
-    console.log('User ID preserved:', newUser.id)
-    console.log("All data should be intact since it's the same user ID")
+
 
     // Reload data to ensure it's properly loaded
     await Promise.all([charactersStore.loadCharacters(), raidsStore.loadRaids()])
-    console.log('Data reloaded after email verification')
+
   }
 })
 
 const signOut = async () => {
   try {
-    console.log('Signing out...')
+
     await supabaseClient.auth.signOut()
-    console.log('Sign out completed')
+
     // Reload data after sign out
     await Promise.all([charactersStore.loadCharacters(), raidsStore.loadRaids()])
-    console.log('Data reloaded after sign out')
+
   } catch (error) {
     console.error('Sign out error:', error)
   }

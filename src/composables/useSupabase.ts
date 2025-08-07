@@ -15,7 +15,6 @@ export const useSupabase = () => {
   // Listen to auth state changes
   const setupAuthListener = () => {
     supabaseClient.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state change:', event, session?.user?.email)
       supabaseUser.value = session?.user ?? null
     })
   }

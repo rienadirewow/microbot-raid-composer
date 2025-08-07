@@ -94,7 +94,7 @@ class SupabaseAdapter implements StorageAdapter {
         throw new Error('No authenticated user found')
       }
 
-      console.log(`Saving data for user ${user.id}, key: ${key}, value:`, value)
+  
 
       // First, try to get existing data
       const { data: existingData } = await this.supabase
@@ -128,7 +128,7 @@ class SupabaseAdapter implements StorageAdapter {
         throw new Error(`Failed to save ${key}: ${error.message}`)
       }
 
-      console.log(`Successfully saved data for key: ${key}`)
+  
     } catch (error) {
       console.error(`Supabase set error for key ${key}:`, error)
       throw error
@@ -220,7 +220,7 @@ export const useStorage = () => {
   const adapter = computed(() => {
     // Always use Supabase since we'll have either authenticated or anonymous users
     const selectedAdapter = new SupabaseAdapter(supabaseClient)
-    console.log('Using storage adapter: Supabase')
+
     return selectedAdapter
   })
 
@@ -234,12 +234,12 @@ export const useStorage = () => {
   // Domain-specific methods for WoW data
   const getPlayerCharacters = async (): Promise<PlayerCharacter[]> => {
     const characters = (await get<PlayerCharacter[]>('characters')) ?? []
-    console.log('Loading characters from storage:', characters.length, 'characters')
+
     return characters
   }
 
   const setPlayerCharacters = async (characters: PlayerCharacter[]): Promise<void> => {
-    console.log('Saving characters to storage:', characters.length, 'characters')
+
     await set('characters', characters)
   }
 

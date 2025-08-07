@@ -117,19 +117,15 @@ import Button from '@/components/ui/Button.vue'
 const { supabaseClient, supabaseUser } = useSupabase()
 
 // Handle auth state changes from the Auth component
-const handleAuthStateChange = (event: string, session: any) => {
-  console.log('Auth state change from component:', event, session)
-}
+const handleAuthStateChange = (event: string, session: any) => {}
 
 // Sign in anonymously
 const signInAnonymously = async () => {
   try {
-    console.log('Signing in anonymously...')
     const { error } = await supabaseClient.auth.signInAnonymously()
     if (error) {
       console.error('Anonymous sign in error:', error)
     } else {
-      console.log('Anonymous sign in successful')
     }
   } catch (error) {
     console.error('Anonymous sign in error:', error)

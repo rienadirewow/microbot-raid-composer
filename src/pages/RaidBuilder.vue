@@ -125,6 +125,6 @@ const loadRaid = (raidId: string) => {
 
 const updateRaidComposition = (composition: CharacterRow[]) => {
   // TODO: Update the raid store with the new composition
-  console.log('Raid composition updated:', composition)
+
 }
 </script>

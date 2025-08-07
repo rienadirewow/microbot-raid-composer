@@ -70,7 +70,6 @@
           </div>
         </div>
         <div class="flex items-center space-x-4">
-          <ProgressBar :value="raidsStore.filledSlots" :max="40" />
           <Button variant="success" size="sm" @click="saveCurrentRaid">Save Raid</Button>
           <Button variant="warning" size="sm" @click="exportRaid">Export Commands</Button>
           <Button variant="secondary" size="sm" @click="clearCurrentRaid">Clear</Button>
@@ -78,8 +77,9 @@
         </div>
       </div>
 
-      <!-- Role Advisor -->
-      <div class="flex items-center justify-end mb-4">
+      <!-- Progress and Role Advisor -->
+      <div class="flex items-center justify-between mb-4">
+        <ProgressBar :value="raidsStore.filledSlots" :max="40" />
         <div class="flex items-center space-x-3 text-sm text-slate-600">
           <div class="flex items-center space-x-1">
             <span class="w-3 h-3 bg-blue-500 rounded-full"></span>

@@ -51,6 +51,7 @@ const props = defineProps<Props>()
 // Emits
 const emit = defineEmits<{
   'update-composition': [composition: CharacterRow[]]
+  'update-current-player': [playerId: string]
 }>()
 
 // State
@@ -198,6 +199,7 @@ const handleClearSlot = () => {
 
 const handleUpdateCurrentPlayer = (playerId: string) => {
   currentPlayerId.value = playerId
+  emit('update-current-player', playerId)
 }
 
 // Lifecycle

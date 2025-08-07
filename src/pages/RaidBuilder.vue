@@ -26,6 +26,7 @@
       :current-raid="raidsStore.currentRaid"
       :current-player-id="currentPlayerId"
       @update-composition="updateRaidComposition"
+      @update-current-player="handleUpdateCurrentPlayer"
     />
 
     <!-- No Current Raid -->
@@ -182,5 +183,9 @@ const updateRaidName = async (newName: string) => {
   raidsStore.updateCurrentRaidName(newName)
   // Autosave the raid after name change
   await raidsStore.saveCurrentRaid()
+}
+
+const handleUpdateCurrentPlayer = (playerId: string) => {
+  currentPlayerId.value = playerId
 }
 </script>

@@ -4,20 +4,24 @@
       <h2 class="text-2xl font-bold text-slate-800 mb-2">Raid Composition</h2>
       <p class="text-slate-600">Each row represents a character and their group members</p>
 
-      <CurrentPlayerSelector
-        :characters="characters"
-        :current-player-id="currentPlayerId"
-        @update:current-player-id="$emit('updateCurrentPlayer', $event)"
-      />
+      <!-- Current Player Information -->
+      <div v-if="currentPlayer" class="mt-4 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl">
+        <h3 class="text-lg font-bold text-amber-800 mb-2">Current Player: {{ capitalizeFirst(currentPlayer.name) }}</h3>
+        <p class="text-sm text-amber-700">{{ getClassDisplayName(currentPlayer.class) }}</p>
+        <p class="text-sm text-amber-700">Raid License: T{{ currentPlayer.unlockedTiers.r }}R | Dungeon License: T{{ currentPlayer.unlockedTiers.d }}D</p>
+      </div>
     </div>
 
     <div class="space-y-4">
       <RaidRow
-        v-for="(row, rowIndex) in composition"
+        v-for="(row, rowIndex) in sortedComposition"
         :key="row.character.id"
         :row="row"
         :row-index="rowIndex"
+        :is-current-player="row.character.id === currentPlayerId"
+        :current-player-id="currentPlayerId"
         @slot-click="(slotIndex) => $emit('slotClick', rowIndex, slotIndex)"
+        @set-current-player="$emit('updateCurrentPlayer', $event)"
       />
     </div>
   </div>
@@ -27,7 +31,6 @@
 import { computed } from 'vue'
 import type { Composition, PlayerCharacter } from '@/types'
 import RaidRow from './RaidRow.vue'
-import CurrentPlayerSelector from './CurrentPlayerSelector.vue'
 
 // Props
 interface Props {
@@ -39,7 +42,7 @@ interface Props {
 const props = defineProps<Props>()
 
 // Emits
-const emit = defineEmits<{
+defineEmits<{
   slotClick: [rowIndex: number, slotIndex: number]
   updateCurrentPlayer: [id: string]
 }>()
@@ -49,20 +52,20 @@ const currentPlayer = computed(() => {
   return props.characters.find((char) => char.id === props.currentPlayerId) || null
 })
 
-// Methods
-const getClassColor = (wowClass: string) => {
-  const classColors: Record<string, string> = {
-    warrior: '#C79C6E',
-    paladin: '#F58CBA',
-    hunter: '#ABD473',
-    rogue: '#FFF569',
-    priest: '#FFFFFF',
-    shaman: '#0070DE',
-    mage: '#69CCF0',
-    warlock: '#9482C9',
-    druid: '#FF7D0A',
+const sortedComposition = computed(() => {
+  // Move current player to the top
+  const currentPlayerRow = props.composition.find(row => row.character.id === props.currentPlayerId)
+  const otherRows = props.composition.filter(row => row.character.id !== props.currentPlayerId)
+  
+  if (currentPlayerRow) {
+    return [currentPlayerRow, ...otherRows]
   }
-  return classColors[wowClass] || '#6B7280'
+  return props.composition
+})
+
+// Methods
+const capitalizeFirst = (str: string) => {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
 }
 
 const getClassDisplayName = (wowClass: string) => {

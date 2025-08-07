@@ -183,15 +183,11 @@ const roleButtons = computed(() => {
     { role: 'dps' as Role, icon: SwordIcon, color: '#EF4444' },
   ]
 
-  // For lite characters (non-control members), only allow applicable roles
-  if (!props.isFirstSlot) {
-    return baseRoles.filter((roleButton) => {
-      // Check if the character's class can fulfill this role
-      return canAssignRole(props.character.class, roleButton.role)
-    })
-  }
-
-  return baseRoles
+  // Filter roles based on character's class (for both character and group member slots)
+  return baseRoles.filter((roleButton) => {
+    // Check if the character's class can fulfill this role
+    return canAssignRole(props.character.class, roleButton.role)
+  })
 })
 
 const availableClasses = computed(() => {

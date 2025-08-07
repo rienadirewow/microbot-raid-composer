@@ -186,14 +186,11 @@ const canAssignRole = (wowClass: WoWClass, role: Role): boolean => {
 }
 
 const getDefaultRole = (): Role => {
-  // For character slots, prioritize tank > healer > dps
+  // For character slots, get the first available role from the class restrictions
   if (props.isFirstSlot) {
-    if (canAssignRole(props.character.class, 'tank')) {
-      return 'tank'
-    } else if (canAssignRole(props.character.class, 'healer')) {
-      return 'healer'
-    } else {
-      return 'dps'
+    const allowedRoles = CLASS_ROLE_RESTRICTIONS[props.character.class] || []
+    if (allowedRoles.length > 0) {
+      return allowedRoles[0] as Role
     }
   }
 
@@ -239,22 +236,35 @@ const modalTitle = computed(() => {
 })
 
 const roleButtons = computed(() => {
-  const baseRoles = [
+  // For character slots (first slot), show only roles the character's class can fulfill
+  if (props.isFirstSlot) {
+    const characterClass = props.character.class
+    const allowedRoles = CLASS_ROLE_RESTRICTIONS[characterClass] || []
+    
+    return allowedRoles.map((role) => {
+      switch (role) {
+        case 'tank':
+          return { role: 'tank' as Role, icon: ShieldIcon, color: '#3B82F6' }
+        case 'healer':
+          return { role: 'healer' as Role, icon: HeartIcon, color: '#10B981' }
+        case 'dps':
+          return { role: 'dps' as Role, icon: SwordIcon, color: '#EF4444' }
+        case 'mdps':
+          return { role: 'mdps' as Role, icon: SwordIcon, color: '#EF4444' }
+        case 'rdps':
+          return { role: 'rdps' as Role, icon: SwordIcon, color: '#EF4444' }
+        default:
+          return { role: 'dps' as Role, icon: SwordIcon, color: '#EF4444' }
+      }
+    })
+  }
+
+  // For companion/group member slots, show all basic roles
+  return [
     { role: 'tank' as Role, icon: ShieldIcon, color: '#3B82F6' },
     { role: 'healer' as Role, icon: HeartIcon, color: '#10B981' },
     { role: 'dps' as Role, icon: SwordIcon, color: '#EF4444' },
   ]
-
-  // Only filter roles for character slots (first slot)
-  if (props.isFirstSlot) {
-    return baseRoles.filter((roleButton) => {
-      // Check if the character's class can fulfill this role
-      return canAssignRole(props.character.class, roleButton.role)
-    })
-  }
-
-  // For companion/group member slots, show all roles
-  return baseRoles
 })
 
 const availableClasses = computed(() => {

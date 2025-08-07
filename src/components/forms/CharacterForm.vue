@@ -1,137 +1,99 @@
 <template>
-  <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-      <div class="mt-3">
-        <!-- Header -->
-        <div class="flex items-center justify-between mb-6">
-          <h3 class="text-lg font-medium text-gray-900">
-            {{ character ? 'Edit Character' : 'Add Character' }}
-          </h3>
-          <button @click="$emit('close')" class="text-gray-400 hover:text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
+  <Modal :title="character ? 'Edit Character' : 'Add Character'" @close="$emit('close')">
+    <!-- Form -->
+    <form @submit.prevent="handleSubmit" class="space-y-4">
+      <!-- Name -->
+      <FormField
+        id="name"
+        label="Character Name"
+        v-model="form.name"
+        type="text"
+        required
+        :error="errors.name"
+        ref="nameInput"
+      />
 
-        <!-- Form -->
-        <form @submit.prevent="handleSubmit" class="space-y-4">
-          <!-- Name -->
-          <div>
-            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">
-              Character Name
-            </label>
+      <!-- Race -->
+      <SelectField
+        id="race"
+        label="Race"
+        v-model="form.race"
+        placeholder="Select Race"
+        required
+        @update:modelValue="handleRaceChange"
+      >
+        <optgroup label="Alliance">
+          <option v-for="race in ALLIANCE_RACES" :key="race" :value="race">
+            {{ formatRaceName(race) }}
+          </option>
+        </optgroup>
+        <optgroup label="Horde">
+          <option v-for="race in HORDE_RACES" :key="race" :value="race">
+            {{ formatRaceName(race) }}
+          </option>
+        </optgroup>
+      </SelectField>
+
+      <!-- Class -->
+      <SelectField
+        id="class"
+        label="Class"
+        v-model="form.class"
+        placeholder="Select Class"
+        required
+        @update:modelValue="handleClassChange"
+      >
+        <option v-for="wowClass in availableClasses" :key="wowClass" :value="wowClass">
+          {{ wowClass.charAt(0).toUpperCase() + wowClass.slice(1) }}
+        </option>
+      </SelectField>
+
+      <!-- Licenses -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2"> Licenses </label>
+        <div class="grid grid-cols-6 gap-2">
+          <label
+            v-for="tier in RAID_TIERS"
+            :key="tier"
+            class="flex items-center space-x-2 px-3 py-2 border rounded-md cursor-pointer transition-colors focus-within:outline-2"
+            :class="getTierColor(tier, form.unlockedTiers.r >= tier)"
+          >
             <input
-              id="name"
-              v-model="form.name"
-              type="text"
-              required
-              ref="nameInput"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              :class="{ 'border-red-500': errors.name }"
+              v-model="form.unlockedTiers.r"
+              type="radio"
+              :value="tier"
+              name="raid-tier"
+              class="sr-only"
             />
-            <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
-          </div>
+            <span class="text-xs"> T{{ tier }}R </span>
+          </label>
 
-          <!-- Race -->
-          <div>
-            <label for="race" class="block text-sm font-medium text-gray-700 mb-1"> Race </label>
-            <select
-              id="race"
-              v-model="form.race"
-              required
-              @change="handleRaceChange"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select Race</option>
-              <optgroup label="Alliance">
-                <option value="human">Human</option>
-                <option value="dwarf">Dwarf</option>
-                <option value="nightelf">Night Elf</option>
-                <option value="gnome">Gnome</option>
-              </optgroup>
-              <optgroup label="Horde">
-                <option value="orc">Orc</option>
-                <option value="undead">Undead</option>
-                <option value="tauren">Tauren</option>
-                <option value="troll">Troll</option>
-              </optgroup>
-            </select>
-          </div>
-
-          <!-- Class -->
-          <div>
-            <label for="class" class="block text-sm font-medium text-gray-700 mb-1"> Class </label>
-            <select
-              id="class"
-              v-model="form.class"
-              required
-              @change="handleClassChange"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="">Select Class</option>
-              <option v-for="wowClass in availableClasses" :key="wowClass" :value="wowClass">
-                {{ wowClass.charAt(0).toUpperCase() + wowClass.slice(1) }}
-              </option>
-            </select>
-          </div>
-
-          <!-- Licenses -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2"> Licenses </label>
-            <div class="grid grid-cols-6 gap-2">
-              <label
-                v-for="tier in RAID_TIERS"
-                :key="tier"
-                class="flex items-center space-x-2 px-3 py-2 border rounded-md cursor-pointer transition-colors focus-within:outline-2"
-                :class="getTierColor(tier, form.unlockedTiers.r >= tier)"
-              >
-                <input
-                  v-model="form.unlockedTiers.r"
-                  type="radio"
-                  :value="tier"
-                  name="raid-tier"
-                  class="sr-only"
-                />
-                <span class="text-xs"> T{{ tier }}R </span>
-              </label>
-
-              <label
-                v-for="tier in DUNGEON_TIERS"
-                :key="tier"
-                class="flex items-center space-x-2 px-3 py-2 border rounded-md cursor-pointer transition-colors focus-within:outline-2"
-                :class="getTierColor(tier, form.unlockedTiers.d >= tier)"
-              >
-                <input
-                  v-model="form.unlockedTiers.d"
-                  type="radio"
-                  :value="tier"
-                  name="dungeon-tier"
-                  class="sr-only"
-                />
-                <span class="text-xs"> T{{ tier }}D </span>
-              </label>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="flex items-center justify-end space-x-3 pt-4">
-            <Button type="button" variant="secondary" size="sm" @click="$emit('close')">
-              Cancel
-            </Button>
-            <Button type="submit" size="sm" :disabled="isSubmitting">
-              {{ isSubmitting ? 'Saving...' : character ? 'Update' : 'Create' }}
-            </Button>
-          </div>
-        </form>
+          <label
+            v-for="tier in DUNGEON_TIERS"
+            :key="tier"
+            class="flex items-center space-x-2 px-3 py-2 border rounded-md cursor-pointer transition-colors focus-within:outline-2"
+            :class="getTierColor(tier, form.unlockedTiers.d >= tier)"
+          >
+            <input
+              v-model="form.unlockedTiers.d"
+              type="radio"
+              :value="tier"
+              name="dungeon-tier"
+              class="sr-only"
+            />
+            <span class="text-xs"> T{{ tier }}D </span>
+          </label>
+        </div>
       </div>
-    </div>
-  </div>
+
+      <!-- Actions -->
+      <FormActions
+        :is-submitting="isSubmitting"
+        :submit-text="character ? 'Update' : 'Create'"
+        @cancel="$emit('close')"
+      />
+    </form>
+  </Modal>
 </template>
 
 <script setup lang="ts">
@@ -139,11 +101,14 @@ import { ref, computed, watch, nextTick } from 'vue'
 import type { PlayerCharacter, Faction, Race, WoWClass, TierLevel } from '@/types'
 import {
   CLASS_RACE_RESTRICTIONS,
+  validateClassRace,
   ALLIANCE_RACES,
   HORDE_RACES,
-  validateClassRace,
 } from '@/data/wow-data'
-import Button from '../ui/Button.vue'
+import Modal from '../ui/Modal.vue'
+import FormField from './FormField.vue'
+import SelectField from './SelectField.vue'
+import FormActions from './FormActions.vue'
 
 // Props
 interface Props {
@@ -258,6 +223,10 @@ watch(
 )
 
 // Methods
+const formatRaceName = (race: string) => {
+  return race.charAt(0).toUpperCase() + race.slice(1).replace(/([A-Z])/g, ' $1')
+}
+
 const handleRaceChange = () => {
   form.value.class = '' as WoWClass
 }

@@ -23,6 +23,7 @@
     <RaidComposition
       v-if="raidsStore.currentRaid"
       :characters="charactersStore.characters"
+      :current-raid="raidsStore.currentRaid"
       @update-composition="updateRaidComposition"
     />
 
@@ -132,37 +133,39 @@ const updateRaidComposition = (composition: CharacterRow[]) => {
     // Find which character row and slot this corresponds to
     const rowIndex = Math.floor(index / 5) // 5 slots per row
     const slotInRow = index % 5 // 0-4 for each row
-    
+
     if (rowIndex < composition.length) {
       const characterRow = composition[rowIndex]
       const playerSlot = characterRow.slots[slotInRow]
-      
+
       if (playerSlot) {
         // Convert PlayerSlot to CompanionAssignment
         const assignment: CompanionAssignment = {
           id: `${characterRow.character.id}-${slotInRow}`,
-          name: playerSlot.isCharacter ? characterRow.character.name : `${characterRow.character.name}'s Companion`,
+          name: playerSlot.isCharacter
+            ? characterRow.character.name
+            : `${characterRow.character.name}'s Companion`,
           class: playerSlot.class,
           role: playerSlot.role,
           tier: playerSlot.tier,
           race: characterRow.character.race,
-          ownerId: characterRow.character.id
+          ownerId: characterRow.character.id,
         }
-        
+
         return {
           ...slot,
-          assignment
+          assignment,
         }
       }
     }
-    
+
     // Return slot without assignment if no data
     return {
       ...slot,
-      assignment: undefined
+      assignment: undefined,
     }
   })
-  
+
   // Update the current raid with the new slots
   raidsStore.currentRaid.slots = updatedSlots
   raidsStore.currentRaid.updatedAt = new Date()

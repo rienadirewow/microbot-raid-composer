@@ -19,14 +19,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import type { PlayerCharacter, CharacterRow, PlayerSlot, WoWClass, Role, TierType, TierLevel } from '@/types'
+import { ref, computed, onMounted, watch } from 'vue'
+import type {
+  PlayerCharacter,
+  CharacterRow,
+  PlayerSlot,
+  WoWClass,
+  Role,
+  TierType,
+  TierLevel,
+  RaidComposition as RaidCompositionType,
+} from '@/types'
 import RaidGrid from './RaidGrid.vue'
 import SlotAssignmentModal from './SlotAssignmentModal.vue'
 
 // Props
 interface Props {
   characters: PlayerCharacter[]
+  currentRaid?: RaidCompositionType
 }
 
 const props = defineProps<Props>()
@@ -61,31 +71,66 @@ const currentCharacter = computed(() => {
 
 // Methods
 const initializeCharacterGroups = () => {
-  composition.value = props.characters.map((character) => {
-    const slots: (PlayerSlot | null)[] = Array(5).fill(null)
+  if (props.currentRaid) {
+    // Initialize with existing raid data
+    composition.value = props.characters.map((character) => {
+      const slots: (PlayerSlot | null)[] = Array(5).fill(null)
+      
+      // Find the character's row in the raid (assuming characters are in order)
+      const characterIndex = props.characters.findIndex(c => c.id === character.id)
+      if (characterIndex !== -1) {
+        // Map raid slots to character slots
+        for (let i = 0; i < 5; i++) {
+          const raidSlotIndex = characterIndex * 5 + i
+          const raidSlot = props.currentRaid!.slots[raidSlotIndex]
+          
+          if (raidSlot?.assignment) {
+            slots[i] = {
+              class: raidSlot.assignment.class,
+              role: raidSlot.assignment.role,
+              tier: raidSlot.assignment.tier,
+              tierType: raidSlot.assignment.tier === character.unlockedTiers.r ? 'R' : 'D',
+              isCharacter: i === 0,
+              characterName: character.name,
+              isControlMember: i === 0,
+            }
+          }
+        }
+      }
 
-    // Auto-assign first slot with character's class and default role
-    const defaultRole: Role = canAssignRole(character.class, 'tank')
-      ? 'tank'
-      : canAssignRole(character.class, 'healer')
-        ? 'healer'
-        : 'dps'
+      return {
+        character,
+        slots,
+      }
+    })
+  } else {
+    // Initialize with empty slots
+    composition.value = props.characters.map((character) => {
+      const slots: (PlayerSlot | null)[] = Array(5).fill(null)
 
-    slots[0] = {
-      class: character.class,
-      role: defaultRole,
-      tier: character.unlockedTiers.r,
-      tierType: 'R',
-      isCharacter: true,
-      characterName: character.name,
-      isControlMember: true,
-    }
+      // Auto-assign first slot with character's class and default role
+      const defaultRole: Role = canAssignRole(character.class, 'tank')
+        ? 'tank'
+        : canAssignRole(character.class, 'healer')
+          ? 'healer'
+          : 'dps'
 
-    return {
-      character,
-      slots,
-    }
-  })
+      slots[0] = {
+        class: character.class,
+        role: defaultRole,
+        tier: character.unlockedTiers.r,
+        tierType: 'R',
+        isCharacter: true,
+        characterName: character.name,
+        isControlMember: true,
+      }
+
+      return {
+        character,
+        slots,
+      }
+    })
+  }
 }
 
 const canAssignRole = (wowClass: WoWClass, role: Role): boolean => {
@@ -147,4 +192,9 @@ const handleClearSlot = () => {
 onMounted(() => {
   initializeCharacterGroups()
 })
+
+// Watch for changes in currentRaid or characters
+watch([() => props.currentRaid, () => props.characters], () => {
+  initializeCharacterGroups()
+}, { deep: true })
 </script>

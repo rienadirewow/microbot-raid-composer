@@ -164,6 +164,42 @@ const emit = defineEmits<{
   clearSlot: []
 }>()
 
+// Helper functions (defined before use)
+const getDefaultRole = (): Role => {
+  // For character slots, prioritize tank > healer > dps
+  if (props.isFirstSlot) {
+    if (canAssignRole(props.character.class, 'tank')) {
+      return 'tank'
+    } else if (canAssignRole(props.character.class, 'healer')) {
+      return 'healer'
+    } else {
+      return 'dps'
+    }
+  }
+  
+  // For companion slots, default to dps
+  return 'dps'
+}
+
+const getDefaultTierType = (): TierType => {
+  // Default to the license type with the higher tier
+  if (props.character.unlockedTiers.r >= props.character.unlockedTiers.d) {
+    return 'R'
+  } else {
+    return 'D'
+  }
+}
+
+const getHighestAvailableTier = (): TierLevel => {
+  // For first slot (character), use the character's highest tier
+  if (props.isFirstSlot) {
+    return Math.max(props.character.unlockedTiers.r, props.character.unlockedTiers.d) as TierLevel
+  }
+
+  // For group members, use the character's highest tier as default
+  return Math.max(props.character.unlockedTiers.r, props.character.unlockedTiers.d) as TierLevel
+}
+
 // State
 const selectedRole = ref<Role>(props.currentSlot?.role || getDefaultRole())
 const selectedClass = ref<WoWClass>(
@@ -316,40 +352,7 @@ const getCurrentTier = () => {
   return selectedLicenseType.value.tier
 }
 
-const getHighestAvailableTier = (): TierLevel => {
-  // For first slot (character), use the character's highest tier
-  if (props.isFirstSlot) {
-    return Math.max(props.character.unlockedTiers.r, props.character.unlockedTiers.d) as TierLevel
-  }
 
-  // For group members, use the character's highest tier as default
-  return Math.max(props.character.unlockedTiers.r, props.character.unlockedTiers.d) as TierLevel
-}
-
-const getDefaultTierType = (): TierType => {
-  // Default to the license type with the higher tier
-  if (props.character.unlockedTiers.r >= props.character.unlockedTiers.d) {
-    return 'R'
-  } else {
-    return 'D'
-  }
-}
-
-const getDefaultRole = (): Role => {
-  // For character slots, prioritize tank > healer > dps
-  if (props.isFirstSlot) {
-    if (canAssignRole(props.character.class, 'tank')) {
-      return 'tank'
-    } else if (canAssignRole(props.character.class, 'healer')) {
-      return 'healer'
-    } else {
-      return 'dps'
-    }
-  }
-  
-  // For companion slots, default to dps
-  return 'dps'
-}
 
 const selectLicenseType = (type: TierType, tier: TierLevel) => {
   selectedLicenseType.value = { type, tier }

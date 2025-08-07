@@ -189,11 +189,16 @@ const roleButtons = computed(() => {
     { role: 'dps' as Role, icon: SwordIcon, color: '#EF4444' },
   ]
 
-  // Filter roles based on character's class (for both character and group member slots)
-  return baseRoles.filter((roleButton) => {
-    // Check if the character's class can fulfill this role
-    return canAssignRole(props.character.class, roleButton.role)
-  })
+  // Only filter roles for character slots (first slot)
+  if (props.isFirstSlot) {
+    return baseRoles.filter((roleButton) => {
+      // Check if the character's class can fulfill this role
+      return canAssignRole(props.character.class, roleButton.role)
+    })
+  }
+
+  // For companion/group member slots, show all roles
+  return baseRoles
 })
 
 const availableClasses = computed(() => {
@@ -319,9 +324,10 @@ const selectLicenseType = (type: TierType, tier: TierLevel) => {
 const getLicenseTypeButtonClass = (type: TierType, tier: TierLevel) => {
   const isSelected =
     selectedLicenseType.value.type === type && selectedLicenseType.value.tier === tier
-  const isAvailable = type === 'R' 
-    ? availableRaidTiers.value.includes(tier)
-    : availableDungeonTiers.value.includes(tier)
+  const isAvailable =
+    type === 'R'
+      ? availableRaidTiers.value.includes(tier)
+      : availableDungeonTiers.value.includes(tier)
 
   // Get tier color based on WoW gear quality colors
   const getTierColor = (tier: TierLevel) => {

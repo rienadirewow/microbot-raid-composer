@@ -56,7 +56,7 @@ const displayName = computed(() => {
   }
 
   if (props.slot.isCharacter && props.slot.characterName) {
-    return capitalizeFirst(props.slot.characterName)
+    return props.isFirstSlot ? `${capitalizeFirst(props.slot.characterName)}-lite` : capitalizeFirst(props.slot.characterName)
   }
 
   return getClassDisplayName(props.slot.class)

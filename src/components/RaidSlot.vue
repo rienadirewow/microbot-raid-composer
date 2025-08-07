@@ -190,7 +190,7 @@ const getTierDisplayName = () => {
 
   const tierName = `T${props.slot.tier}`
   const typeName = props.slot.tierType === 'R' ? 'R' : 'D'
-  return `${tierName}${typeName} gear`
+  return `${tierName}${typeName}`
 }
 
 const getBackgroundColor = () => {

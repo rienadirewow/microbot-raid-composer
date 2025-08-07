@@ -16,14 +16,14 @@
               />
             </svg>
           </div>
-          <div>
+          <div class="min-w-0 flex-1">
             <h3 class="text-xl font-bold text-amber-800">Current Player</h3>
-            <p class="text-base font-medium" :style="{ color: getClassColor(currentPlayer.class) }">
+            <p class="text-base font-medium truncate" :style="{ color: getClassColor(currentPlayer.class) }">
               {{ currentPlayer.name }} - {{ getClassDisplayName(currentPlayer.class) }} ({{
                 currentPlayer.faction
               }})
             </p>
-            <p class="text-sm text-amber-700 mt-2">
+            <p class="text-sm text-amber-700 mt-2 truncate">
               Raid License: {{ currentPlayer.unlockedTiers.r.toUpperCase() }} | Dungeon License:
               {{ currentPlayer.unlockedTiers.d.toUpperCase() }}
             </p>

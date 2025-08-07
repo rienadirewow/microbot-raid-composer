@@ -1,27 +1,27 @@
 <template>
   <div
     @click="$emit('click')"
-    class="flex-shrink-0 w-48 h-24 border rounded-xl p-3 transition-all duration-200 cursor-pointer hover:shadow-md"
+    class="flex-shrink-0 w-48 h-24 border rounded-xl p-3 transition-all duration-200 cursor-pointer hover:shadow-md overflow-hidden"
     :class="slotClasses"
     :style="{ backgroundColor: getBackgroundColor() }"
   >
     <div class="flex items-start justify-between h-full">
-      <div class="flex-1">
-        <div class="font-semibold text-lg" :style="{ color: getDisplayNameColor() }">
+      <div class="flex-1 min-w-0">
+        <div class="font-semibold text-base truncate" :style="{ color: getDisplayNameColor() }">
           {{ displayName }}
         </div>
         <div
           v-if="slot?.role"
-          class="inline-block px-3 py-1 text-sm font-medium rounded-full mt-2"
+          class="inline-block px-2 py-0.5 text-xs font-medium rounded-full mt-1"
           :class="getRoleBadgeClass(slot.role)"
         >
           {{ getRoleDisplayName(slot.role) }}
         </div>
-        <div class="text-sm mt-2 font-medium" :style="{ color: getTierTextColor() }">
+        <div class="text-xs mt-1 font-medium truncate" :style="{ color: getTierTextColor() }">
           {{ getTierDisplayName() }}
         </div>
       </div>
-      <div class="w-6 h-6" :class="iconClasses">
+      <div class="w-5 h-5 flex-shrink-0 ml-2" :class="iconClasses">
         <component :is="getRoleIcon()" />
       </div>
     </div>

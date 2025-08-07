@@ -52,11 +52,11 @@ const emit = defineEmits<{
 // Computed
 const displayName = computed(() => {
   if (!props.slot) {
-    return props.isFirstSlot ? `${props.character.name.toUpperCase()}-lite` : 'Group Member'
+    return props.isFirstSlot ? `${capitalizeFirst(props.character.name)}-lite` : 'Group Member'
   }
 
   if (props.slot.isCharacter && props.slot.characterName) {
-    return props.slot.characterName.toUpperCase()
+    return capitalizeFirst(props.slot.characterName)
   }
 
   return getClassDisplayName(props.slot.class)
@@ -106,6 +106,10 @@ const iconClasses = computed(() => {
 })
 
 // Methods
+const capitalizeFirst = (str: string) => {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}
+
 const getRoleBadgeClass = (role: Role) => {
   switch (role) {
     case 'tank':

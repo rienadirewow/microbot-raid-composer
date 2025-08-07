@@ -18,7 +18,7 @@
               class="text-base font-medium truncate"
               :style="{ color: getClassColor(currentPlayer.class) }"
             >
-              {{ currentPlayer.name }} - {{ getClassDisplayName(currentPlayer.class) }} ({{
+              {{ capitalizeFirst(currentPlayer.name) }} - {{ getClassDisplayName(currentPlayer.class) }} ({{
                 currentPlayer.faction
               }})
             </p>
@@ -48,12 +48,12 @@
         "
       >
         <div class="flex flex-col items-center text-center">
-          <p 
-            class="font-medium text-sm mb-1 truncate w-full" 
-            :style="{ color: getClassColor(character.class) }"
-          >
-            {{ character.name }}
-          </p>
+                      <p
+              class="font-medium text-sm mb-1 truncate w-full"
+              :style="{ color: getClassColor(character.class) }"
+            >
+              {{ capitalizeFirst(character.name) }}
+            </p>
           <p class="text-xs text-gray-600 mb-1">
             {{ getClassDisplayName(character.class) }}
           </p>
@@ -98,6 +98,10 @@ const currentPlayer = computed(() => {
 })
 
 // Methods
+const capitalizeFirst = (str: string) => {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}
+
 const selectCurrentPlayer = (character: PlayerCharacter) => {
   emit('update:currentPlayerId', character.id)
 }

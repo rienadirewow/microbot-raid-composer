@@ -69,7 +69,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import type { PlayerCharacter, CharacterRow } from '@/types'
+import type { PlayerCharacter, CharacterRow, CompanionAssignment } from '@/types'
 import { useCharactersStore } from '@/stores/characters'
 import { useRaidsStore } from '@/stores/raids'
 import PageHeader from '../components/layout/PageHeader.vue'
@@ -125,7 +125,47 @@ const loadRaid = (raidId: string) => {
 }
 
 const updateRaidComposition = (composition: CharacterRow[]) => {
-  // TODO: Update the raid store with the new composition
+  if (!raidsStore.currentRaid) return
+
+  // Convert the new composition format to the old format
+  const updatedSlots = raidsStore.currentRaid.slots.map((slot, index) => {
+    // Find which character row and slot this corresponds to
+    const rowIndex = Math.floor(index / 5) // 5 slots per row
+    const slotInRow = index % 5 // 0-4 for each row
+    
+    if (rowIndex < composition.length) {
+      const characterRow = composition[rowIndex]
+      const playerSlot = characterRow.slots[slotInRow]
+      
+      if (playerSlot) {
+        // Convert PlayerSlot to CompanionAssignment
+        const assignment: CompanionAssignment = {
+          id: `${characterRow.character.id}-${slotInRow}`,
+          name: playerSlot.isCharacter ? characterRow.character.name : `${characterRow.character.name}'s Companion`,
+          class: playerSlot.class,
+          role: playerSlot.role,
+          tier: playerSlot.tier,
+          race: characterRow.character.race,
+          ownerId: characterRow.character.id
+        }
+        
+        return {
+          ...slot,
+          assignment
+        }
+      }
+    }
+    
+    // Return slot without assignment if no data
+    return {
+      ...slot,
+      assignment: undefined
+    }
+  })
+  
+  // Update the current raid with the new slots
+  raidsStore.currentRaid.slots = updatedSlots
+  raidsStore.currentRaid.updatedAt = new Date()
 }
 
 const updateRaidName = (newName: string) => {

@@ -360,6 +360,10 @@ const suggestedRoles = computed(() => {
 // Methods
 const createNewRaid = () => {
   raidsStore.createNewRaid('mixed')
+  // Initialize character groups for the new raid
+  nextTick(() => {
+    initializeCharacterGroups()
+  })
 }
 
 const saveCurrentRaid = async () => {

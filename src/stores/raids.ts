@@ -131,16 +131,16 @@ export const useRaidsStore = defineStore('raids', () => {
   // Update current raid name
   const updateCurrentRaidName = (newName: string) => {
     if (!currentRaid.value) return false
-    
+
     currentRaid.value.name = newName
     currentRaid.value.updatedAt = new Date()
-    
+
     // Update in the raids array as well
     const index = raids.value.findIndex((r) => r.id === currentRaid.value!.id)
     if (index !== -1) {
       raids.value[index] = { ...currentRaid.value }
     }
-    
+
     return true
   }
 

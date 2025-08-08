@@ -94,8 +94,6 @@ class SupabaseAdapter implements StorageAdapter {
         throw new Error('No authenticated user found')
       }
 
-  
-
       // First, try to get existing data
       const { data: existingData } = await this.supabase
         .from('user_data')
@@ -127,8 +125,6 @@ class SupabaseAdapter implements StorageAdapter {
         console.error('Supabase set error:', error)
         throw new Error(`Failed to save ${key}: ${error.message}`)
       }
-
-  
     } catch (error) {
       console.error(`Supabase set error for key ${key}:`, error)
       throw error
@@ -239,7 +235,6 @@ export const useStorage = () => {
   }
 
   const setPlayerCharacters = async (characters: PlayerCharacter[]): Promise<void> => {
-
     await set('characters', characters)
   }
 

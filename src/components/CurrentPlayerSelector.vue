@@ -26,8 +26,9 @@
             <p class="text-base text-amber-700">No current player selected</p>
           </div>
           <p v-if="currentPlayer" class="text-sm text-amber-700 mt-2 truncate">
-            Raid License: T{{ currentPlayer.unlockedTiers.r }}R | Dungeon License:
-            T{{ currentPlayer.unlockedTiers.d }}D
+            Raid License: T{{ currentPlayer.unlockedTiers.r }}R | Dungeon License: T{{
+              currentPlayer.unlockedTiers.d
+            }}D
           </p>
         </div>
       </div>

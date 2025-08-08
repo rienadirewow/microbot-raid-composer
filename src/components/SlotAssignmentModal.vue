@@ -504,7 +504,8 @@ watch(
     if (props.isOpen) {
       // Reset modal state when opening
       selectedRole.value = props.currentSlot?.role || getDefaultRole()
-      selectedClass.value = props.currentSlot?.class || (props.isFirstSlot ? props.character.class : 'warrior')
+      selectedClass.value =
+        props.currentSlot?.class || (props.isFirstSlot ? props.character.class : 'warrior')
       selectedTierType.value = props.currentSlot?.tierType || getDefaultTierType()
       selectedLicenseType.value = {
         type: props.currentSlot?.tierType || 'R',
@@ -512,7 +513,7 @@ watch(
       }
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 // Simple icon render functions

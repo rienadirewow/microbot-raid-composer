@@ -252,8 +252,6 @@ const handleAuthStateChange = async (event: string, session: any) => {
       const anonymousCharacters = [...charactersStore.characters]
       const anonymousRaids = [...raidsStore.raids]
 
-
-
       // Store this data temporarily to migrate after the user change
       if (anonymousCharacters.length > 0 || anonymousRaids.length > 0) {
         localStorage.setItem(
@@ -264,11 +262,8 @@ const handleAuthStateChange = async (event: string, session: any) => {
             timestamp: Date.now(),
           }),
         )
-
-
       }
     } else {
-
     }
 
     showSignUpModal.value = false
@@ -277,26 +272,19 @@ const handleAuthStateChange = async (event: string, session: any) => {
 
 // Watch for user changes to detect when email verification is completed
 watch(supabaseUser, async (newUser, oldUser) => {
-
-
   // Check if user just completed email verification (went from anonymous to permanent)
   if (oldUser?.is_anonymous && !newUser?.is_anonymous && newUser?.email) {
-
-
     // Reload data to ensure it's properly loaded
     await Promise.all([charactersStore.loadCharacters(), raidsStore.loadRaids()])
-
   }
 })
 
 const signOut = async () => {
   try {
-
     await supabaseClient.auth.signOut()
 
     // Reload data after sign out
     await Promise.all([charactersStore.loadCharacters(), raidsStore.loadRaids()])
-
   } catch (error) {
     console.error('Sign out error:', error)
   }

@@ -1,7 +1,7 @@
 <template>
   <div
     @click="$emit('click')"
-    class="flex-shrink-0 w-48 h-24 border rounded-xl p-3 transition-all duration-200 cursor-pointer hover:shadow-md overflow-hidden relative"
+    class="flex-shrink-0 border rounded-xl p-3 transition-all duration-200 cursor-pointer hover:shadow-md overflow-hidden relative"
     :class="slotClasses"
     :style="{ backgroundColor: getBackgroundColor() }"
   >

@@ -460,7 +460,7 @@ const handleUpdateCurrentPlayer = (playerId: string) => {
 const initializeCharacterGroupsForNewRaid = () => {
   console.log('Initializing character groups for NEW raid...')
   console.log('Characters:', charactersStore.characters)
-  
+
   // Initialize with empty slots and include lite characters by default
   composition.value = charactersStore.characters.map((character) => {
     const slots: (PlayerSlot | null)[] = Array(5).fill(null)
@@ -498,7 +498,7 @@ const initializeCharacterGroupsForNewRaid = () => {
       slots,
     }
   })
-  
+
   console.log('Final composition for new raid:', composition.value)
 }
 
@@ -506,7 +506,7 @@ const initializeCharacterGroups = () => {
   console.log('Initializing character groups for EXISTING raid...')
   console.log('Current raid:', raidsStore.currentRaid)
   console.log('Characters:', charactersStore.characters)
- 
+
   if (raidsStore.currentRaid) {
     // Initialize with existing raid data
     composition.value = charactersStore.characters.map((character) => {
@@ -540,7 +540,7 @@ const initializeCharacterGroups = () => {
       }
     })
   }
- 
+
   console.log('Final composition for existing raid:', composition.value)
 }
 

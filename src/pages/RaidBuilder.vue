@@ -361,7 +361,7 @@ const suggestedRoles = computed(() => {
 const createNewRaid = () => {
   raidsStore.createNewRaid('mixed')
   // Initialize character groups for the new raid immediately
-  initializeCharacterGroups()
+  initializeCharacterGroupsForNewRaid()
 }
 
 const saveCurrentRaid = async () => {
@@ -457,11 +457,56 @@ const handleUpdateCurrentPlayer = (playerId: string) => {
   currentPlayerId.value = playerId
 }
 
-const initializeCharacterGroups = () => {
-  console.log('Initializing character groups...')
-  console.log('Current raid:', raidsStore.currentRaid)
+const initializeCharacterGroupsForNewRaid = () => {
+  console.log('Initializing character groups for NEW raid...')
   console.log('Characters:', charactersStore.characters)
   
+  // Initialize with empty slots and include lite characters by default
+  composition.value = charactersStore.characters.map((character) => {
+    const slots: (PlayerSlot | null)[] = Array(5).fill(null)
+
+    // Auto-assign first slot with character's class and default role
+    const defaultRole = canAssignRole(character.class, 'tank')
+      ? 'tank'
+      : canAssignRole(character.class, 'healer')
+        ? 'healer'
+        : 'dps'
+
+    slots[0] = {
+      class: character.class,
+      role: defaultRole,
+      tier: character.unlockedTiers.r,
+      tierType: 'R',
+      isCharacter: true,
+      characterName: character.name,
+      isControlMember: true,
+    }
+
+    // Include lite character in second slot by default
+    slots[1] = {
+      class: character.class,
+      role: defaultRole,
+      tier: character.unlockedTiers.r,
+      tierType: 'R',
+      isCharacter: true,
+      characterName: character.name,
+      isControlMember: false,
+    }
+
+    return {
+      character,
+      slots,
+    }
+  })
+  
+  console.log('Final composition for new raid:', composition.value)
+}
+
+const initializeCharacterGroups = () => {
+  console.log('Initializing character groups for EXISTING raid...')
+  console.log('Current raid:', raidsStore.currentRaid)
+  console.log('Characters:', charactersStore.characters)
+ 
   if (raidsStore.currentRaid) {
     // Initialize with existing raid data
     composition.value = charactersStore.characters.map((character) => {
@@ -494,47 +539,9 @@ const initializeCharacterGroups = () => {
         slots,
       }
     })
-  } else {
-    // Initialize with empty slots and include lite characters by default
-    composition.value = charactersStore.characters.map((character) => {
-      const slots: (PlayerSlot | null)[] = Array(5).fill(null)
-
-      // Auto-assign first slot with character's class and default role
-      const defaultRole = canAssignRole(character.class, 'tank')
-        ? 'tank'
-        : canAssignRole(character.class, 'healer')
-          ? 'healer'
-          : 'dps'
-
-      slots[0] = {
-        class: character.class,
-        role: defaultRole,
-        tier: character.unlockedTiers.r,
-        tierType: 'R',
-        isCharacter: true,
-        characterName: character.name,
-        isControlMember: true,
-      }
-
-      // Include lite character in second slot by default
-      slots[1] = {
-        class: character.class,
-        role: defaultRole,
-        tier: character.unlockedTiers.r,
-        tierType: 'R',
-        isCharacter: true,
-        characterName: character.name,
-        isControlMember: false,
-      }
-
-      return {
-        character,
-        slots,
-      }
-    })
   }
-  
-  console.log('Final composition:', composition.value)
+ 
+  console.log('Final composition for existing raid:', composition.value)
 }
 
 const canAssignRole = (wowClass: string, role: string): boolean => {

@@ -360,10 +360,8 @@ const suggestedRoles = computed(() => {
 // Methods
 const createNewRaid = () => {
   raidsStore.createNewRaid('mixed')
-  // Initialize character groups for the new raid
-  nextTick(() => {
-    initializeCharacterGroups()
-  })
+  // Initialize character groups for the new raid immediately
+  initializeCharacterGroups()
 }
 
 const saveCurrentRaid = async () => {
@@ -460,6 +458,10 @@ const handleUpdateCurrentPlayer = (playerId: string) => {
 }
 
 const initializeCharacterGroups = () => {
+  console.log('Initializing character groups...')
+  console.log('Current raid:', raidsStore.currentRaid)
+  console.log('Characters:', charactersStore.characters)
+  
   if (raidsStore.currentRaid) {
     // Initialize with existing raid data
     composition.value = charactersStore.characters.map((character) => {
@@ -531,6 +533,8 @@ const initializeCharacterGroups = () => {
       }
     })
   }
+  
+  console.log('Final composition:', composition.value)
 }
 
 const canAssignRole = (wowClass: string, role: string): boolean => {

@@ -493,7 +493,7 @@ const initializeCharacterGroups = () => {
       }
     })
   } else {
-    // Initialize with empty slots
+    // Initialize with empty slots and include lite characters by default
     composition.value = charactersStore.characters.map((character) => {
       const slots: (PlayerSlot | null)[] = Array(5).fill(null)
 
@@ -512,6 +512,17 @@ const initializeCharacterGroups = () => {
         isCharacter: true,
         characterName: character.name,
         isControlMember: true,
+      }
+
+      // Include lite character in second slot by default
+      slots[1] = {
+        class: character.class,
+        role: defaultRole,
+        tier: character.unlockedTiers.r,
+        tierType: 'R',
+        isCharacter: true,
+        characterName: character.name,
+        isControlMember: false,
       }
 
       return {

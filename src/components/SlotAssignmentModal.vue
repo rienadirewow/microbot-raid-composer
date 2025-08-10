@@ -171,7 +171,7 @@
 <script setup lang="ts">
 import { ref, computed, h, watch } from 'vue'
 import type { PlayerSlot, PlayerCharacter, Role, WoWClass, TierType, TierLevel, Race } from '@/types'
-import { CLASS_ROLE_RESTRICTIONS, ALLIANCE_RACES, HORDE_RACES, CLASS_RACE_RESTRICTIONS } from '@/data/wow-data'
+import { CLASS_ROLE_RESTRICTIONS, CLASS_DEFAULT_ROLES, ALLIANCE_RACES, HORDE_RACES, CLASS_RACE_RESTRICTIONS } from '@/data/wow-data'
 import Modal from './ui/Modal.vue'
 import Button from './ui/Button.vue'
 
@@ -227,10 +227,7 @@ const getDefaultRole = (): Role => {
     }
   }
 
-  // For companion slots, use character's default role if set, otherwise default to dps
-  if (props.character.defaultRole) {
-    return props.character.defaultRole
-  }
+  // For companion slots, default to dps (companions should not inherit character's role)
   return 'dps'
 }
 
@@ -365,9 +362,12 @@ const handleClassSelect = (wowClass: WoWClass) => {
   // Update role selection based on the new class
   const classRoles = CLASS_ROLE_RESTRICTIONS[wowClass] || []
 
-  // If current role is not available for the new class, switch to first available role
+  // If current role is not available for the new class, switch to the class's default role
   if (!classRoles.includes(selectedRole.value)) {
-    if (classRoles.includes('tank')) {
+    const defaultRole = CLASS_DEFAULT_ROLES[wowClass]
+    if (defaultRole && classRoles.includes(defaultRole)) {
+      selectedRole.value = defaultRole
+    } else if (classRoles.includes('tank')) {
       selectedRole.value = 'tank'
     } else if (classRoles.includes('healer')) {
       selectedRole.value = 'healer'

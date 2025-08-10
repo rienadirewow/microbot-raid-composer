@@ -1,0 +1,18 @@
+{
+  "// NOTE": "This config is shared with .cursor/.mcp.json - edit both files together",
+  "// SOURCE": "Canonical version maintained in .dev/mcp/config.json",
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--read-only",
+        "--project-ref=$SUPABASE_PROJECT_REF"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "$SUPABASE_MCP_KEY"
+      }
+    }
+  }
+}

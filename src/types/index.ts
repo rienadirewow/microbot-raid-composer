@@ -25,6 +25,7 @@ export interface PlayerCharacter {
   race: Race
   faction: Faction
   level: number
+  defaultRole?: Role // Default role for this character
   unlockedTiers: {
     r: TierLevel
     d: TierLevel
@@ -37,6 +38,7 @@ export interface PlayerSlot {
   role: Role
   tier: TierLevel
   tierType: TierType
+  race?: Race // Optional race selection for companions
   isCharacter?: boolean
   characterName?: string
   isControlMember?: boolean
@@ -80,11 +82,31 @@ export interface RaidSlot {
   assignment?: CompanionAssignment
 }
 
+export interface CharacterSlotGroup {
+  characterId: string
+  liteSlot: RaidSlotAssignment | null      // Slot 0: Lite clone (free)
+  companionSlots: (RaidSlotAssignment | null)[]  // Slots 1-4: Hired companions
+}
+
+export interface RaidSlotAssignment {
+  class: WoWClass
+  role: Role
+  tier: TierLevel
+  tierType: TierType
+  race?: Race
+  isLite: boolean
+  characterName?: string
+}
+
 export interface RaidComposition {
   id: string
   name: string
   faction: Faction
-  slots: RaidSlot[]
+  currentPlayerId?: string  // Which character is the current player
+  currentPlayerRole?: Role  // Current player's role (defaults to DPS)
+  characterSlots: CharacterSlotGroup[]  // New structure
+  // Legacy support
+  slots: RaidSlot[]  // Keep for backward compatibility
   createdAt: Date
   updatedAt: Date
 }

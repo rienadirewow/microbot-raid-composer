@@ -95,62 +95,11 @@
     </div>
 
     <!-- Sign Up Modal -->
-    <div
-      v-if="showSignUpModal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
-    >
-      <div class="relative top-10 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
-        <div class="mt-3">
-          <!-- Header -->
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="text-lg font-medium text-gray-900">Create Account</h3>
-            <button @click="showSignUpModal = false" class="text-gray-400 hover:text-gray-600">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          <!-- Custom Sign Up Form for Anonymous User Linking -->
-          <form @submit.prevent="handleAnonymousSignUp" class="space-y-4">
-            <div>
-              <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-              <input
-                id="email"
-                v-model="signUpForm.email"
-                type="email"
-                required
-                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter your email"
-              />
-            </div>
-            <div>
-              <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-              <input
-                id="password"
-                v-model="signUpForm.password"
-                type="password"
-                required
-                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter your password"
-              />
-            </div>
-            <button
-              type="submit"
-              :disabled="isSigningUp"
-              class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              {{ isSigningUp ? 'Creating Account...' : 'Create Account' }}
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
+    <GuestSignupModal 
+      :show="showSignUpModal"
+      @close="showSignUpModal = false"
+      @success="handleSignupSuccess"
+    />
   </nav>
 </template>
 
@@ -160,15 +109,11 @@ import { useCharactersStore } from '@/stores/characters'
 import { useRaidsStore } from '@/stores/raids'
 import { useSupabase } from '@/composables/useSupabase'
 import Button from '../ui/Button.vue'
+import GuestSignupModal from '../auth/GuestSignupModal.vue'
 
 // State
 const mobileMenuOpen = ref(false)
 const showSignUpModal = ref(false)
-const isSigningUp = ref(false)
-const signUpForm = ref({
-  email: '',
-  password: '',
-})
 
 // Stores
 const charactersStore = useCharactersStore()
@@ -181,94 +126,10 @@ const { supabaseClient, supabaseUser } = useSupabase()
 watch(supabaseUser, (user) => {})
 
 // Methods
-const handleAnonymousSignUp = async () => {
-  if (!signUpForm.value.email || !signUpForm.value.password) {
-    alert('Please fill in all fields')
-    return
-  }
-
-  isSigningUp.value = true
-
-  try {
-    // Check if current user is anonymous
-    const currentUser = supabaseUser.value
-    const isAnonymous = currentUser?.is_anonymous === true
-
-    if (isAnonymous) {
-      // Use updateUser to link email to anonymous account
-      const { data: updateData, error: updateError } = await supabaseClient.auth.updateUser({
-        email: signUpForm.value.email,
-      })
-
-      if (updateError) {
-        console.error('Error linking email:', updateError)
-        alert('Error setting up account. Please try again.')
-        return
-      }
-
-      alert(
-        'Please check your email and click the verification link to complete your account setup.',
-      )
-
-      // Data should be preserved since it's the same user ID
-    } else {
-      // Create new account (this will lose any existing data)
-      const { data, error } = await supabaseClient.auth.signUp({
-        email: signUpForm.value.email,
-        password: signUpForm.value.password,
-      })
-
-      if (error) {
-        console.error('Error creating account:', error)
-        alert('Error creating account. Please try again.')
-        return
-      }
-
-      alert(
-        'Please check your email and click the verification link to complete your account setup.',
-      )
-    }
-
-    // Reset form and close modal
-    signUpForm.value = { email: '', password: '' }
-    showSignUpModal.value = false
-  } catch (error) {
-    console.error('Sign up error:', error)
-    alert('An unexpected error occurred. Please try again.')
-  } finally {
-    isSigningUp.value = false
-  }
+const handleSignupSuccess = () => {
+  showSignUpModal.value = false
 }
 
-const handleAuthStateChange = async (event: string, session: any) => {
-  if (event === 'SIGNED_IN') {
-    // Check if this is a new sign-up from an anonymous user
-    const currentUser = supabaseUser.value
-    const wasAnonymous = currentUser?.is_anonymous === true
-    const isNewUser = session?.user?.id !== currentUser?.id
-
-    if (wasAnonymous && isNewUser) {
-      // Store the current user's data before the auth state changes
-      const anonymousCharacters = [...charactersStore.characters]
-      const anonymousRaids = [...raidsStore.raids]
-
-      // Store this data temporarily to migrate after the user change
-      if (anonymousCharacters.length > 0 || anonymousRaids.length > 0) {
-        localStorage.setItem(
-          'anonymousDataToMigrate',
-          JSON.stringify({
-            characters: anonymousCharacters,
-            raids: anonymousRaids,
-            timestamp: Date.now(),
-          }),
-        )
-      }
-    } else {
-    }
-
-    showSignUpModal.value = false
-  }
-}
 
 // Watch for user changes to detect when email verification is completed
 watch(supabaseUser, async (newUser, oldUser) => {

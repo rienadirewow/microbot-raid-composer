@@ -35,6 +35,14 @@
 
 ## 🔄 Development Workflow
 
+### Git Workflow Standards
+- **Commit regularly** after completing logical units of work (features, bug fixes, refactors)
+- **Use descriptive commit messages** that explain the "why" not just the "what"
+- **Commit before major changes** to preserve working states and enable easy rollback
+- **Group related changes** into logical commits (don't mix unrelated changes)
+- **Include all related files** in commits (avoid leaving untracked files)
+- **Follow project commit message style** with clear, concise descriptions
+
 ### State Management Patterns
 - **Pinia stores** for persistent data (characters, raids)
 - **Reactive watchers** for auto-save functionality

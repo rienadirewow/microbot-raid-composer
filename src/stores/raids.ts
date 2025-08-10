@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
-import type { RaidComposition, RaidSlot, CompanionAssignment, Faction } from '@/types'
+import type { RaidComposition, RaidSlot, CompanionAssignment, Faction, CharacterSlotGroup } from '@/types'
 import { useStorage } from '@/composables/useStorage'
 import { TOTAL_RAID_SLOTS, RAID_GROUPS, SLOTS_PER_GROUP } from '@/data/wow-data'
 
@@ -27,6 +27,7 @@ export const useRaidsStore = defineStore('raids', () => {
 
   // Create a new raid
   const createNewRaid = (faction: Faction, name?: string) => {
+    // Create legacy slots for backward compatibility
     const slots: RaidSlot[] = []
     let slotNumber = 1
 
@@ -44,7 +45,9 @@ export const useRaidsStore = defineStore('raids', () => {
       id: crypto.randomUUID(),
       name: name || 'New Raid',
       faction,
-      slots,
+      currentPlayerId: undefined,
+      characterSlots: [], // Start with empty character slots
+      slots, // Legacy format
       createdAt: new Date(),
       updatedAt: new Date(),
     }

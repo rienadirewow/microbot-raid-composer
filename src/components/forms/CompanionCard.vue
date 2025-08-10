@@ -6,7 +6,7 @@
       :character-race="character.race"
       :unlocked-tiers="character.unlockedTiers"
       @select="$emit('select', character, $event)"
-      @update:form="$emit('update:form', character, $event, $event)"
+      @update:form="$emit('update:form', character, $event)"
     />
   </div>
 </template>
@@ -27,15 +27,6 @@ defineProps<Props>()
 // Emits
 defineEmits<{
   select: [character: PlayerCharacter, companionIndex: number]
-  'update:form': [
-    character: PlayerCharacter,
-    companionIndex: number,
-    form: {
-      name: string
-      class: string
-      role: string
-      tier: number
-    },
-  ]
+  'update:form': [character: PlayerCharacter, form: any]
 }>()
 </script>

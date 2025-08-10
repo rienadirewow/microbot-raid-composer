@@ -18,13 +18,13 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { TierLevel, WoWClass, Role } from '@/types'
+import type { TierLevel, WoWClass, Role, Race } from '@/types'
 import CompanionForm from './CompanionForm.vue'
 
 // Props
 interface Props {
   slotNumber: number
-  characterRace: string
+  characterRace: Race
   unlockedTiers: {
     r: TierLevel
     d: TierLevel

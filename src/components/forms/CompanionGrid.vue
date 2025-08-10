@@ -13,12 +13,12 @@
 </template>
 
 <script setup lang="ts">
-import type { TierLevel } from '@/types'
+import type { TierLevel, Race } from '@/types'
 import CompanionSlot from './CompanionSlot.vue'
 
 // Props
 interface Props {
-  characterRace: string
+  characterRace: Race
   unlockedTiers: {
     r: TierLevel
     d: TierLevel

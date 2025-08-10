@@ -97,6 +97,36 @@
         </div>
       </div>
 
+      <!-- Race Selection - Only show for non-first slots (companions) -->
+      <div v-if="!isFirstSlot">
+        <h3 class="text-lg font-bold text-slate-800 mb-3">Select Race (Optional)</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <button
+            v-for="race in availableRaces"
+            :key="race"
+            @click="toggleRace(race)"
+            class="p-3 rounded-lg border-2 text-left transition-all duration-200 hover:shadow-sm"
+            :class="
+              selectedRace === race
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-gray-300 hover:border-gray-400'
+            "
+          >
+            <div class="flex items-center justify-between">
+              <span class="font-medium">{{ getRaceDisplayName(race) }}</span>
+              <div v-if="selectedRace === race" class="w-5 h-5 text-blue-500">
+                <svg fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+            </div>
+          </button>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">
+          Click to select/deselect. Useful for specific needs like Dwarf Priest (Fear Ward)
+        </p>
+      </div>
+
       <!-- Tier Info -->
       <div class="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg p-4 border border-slate-200">
         <p class="text-base text-slate-700 font-medium">
@@ -140,8 +170,8 @@
 
 <script setup lang="ts">
 import { ref, computed, h, watch } from 'vue'
-import type { PlayerSlot, PlayerCharacter, Role, WoWClass, TierType, TierLevel } from '@/types'
-import { CLASS_ROLE_RESTRICTIONS } from '@/data/wow-data'
+import type { PlayerSlot, PlayerCharacter, Role, WoWClass, TierType, TierLevel, Race } from '@/types'
+import { CLASS_ROLE_RESTRICTIONS, ALLIANCE_RACES, HORDE_RACES, CLASS_RACE_RESTRICTIONS } from '@/data/wow-data'
 import Modal from './ui/Modal.vue'
 import Button from './ui/Button.vue'
 
@@ -160,7 +190,7 @@ const props = defineProps<Props>()
 // Emits
 const emit = defineEmits<{
   close: []
-  assignSlot: [wowClass: WoWClass, role: Role, tierType: TierType, tier: TierLevel]
+  assignSlot: [wowClass: WoWClass, role: Role, tierType: TierType, tier: TierLevel, race?: Race]
   clearSlot: []
 }>()
 
@@ -223,6 +253,7 @@ const selectedClass = ref<WoWClass>(
   props.currentSlot?.class || (props.isFirstSlot ? props.character.class : 'warrior'),
 )
 const selectedTierType = ref<TierType>(props.currentSlot?.tierType || getDefaultTierType())
+const selectedRace = ref<Race | undefined>(props.currentSlot?.race)
 
 // License type selection state
 const selectedLicenseType = ref<{ type: TierType; tier: TierLevel }>({
@@ -303,6 +334,17 @@ const availableClasses = computed(() => {
     if (cls === 'shaman' && props.character.faction !== 'horde') return false
     return true
   })
+})
+
+const availableRaces = computed(() => {
+  const classRaces = CLASS_RACE_RESTRICTIONS[selectedClass.value] || []
+  // Filter by character faction (parent character determines available races)
+  if (props.character.faction === 'alliance') {
+    return classRaces.filter(race => ALLIANCE_RACES.includes(race as any))
+  } else if (props.character.faction === 'horde') {
+    return classRaces.filter(race => HORDE_RACES.includes(race as any))
+  }
+  return classRaces
 })
 
 // Handle class selection
@@ -484,10 +526,33 @@ const getClassButtonBackground = (wowClass: string) => {
   return classColor + '25' // Add 25% opacity
 }
 
+const getRaceDisplayName = (race: Race) => {
+  const raceNames: Record<Race, string> = {
+    human: 'Human',
+    dwarf: 'Dwarf', 
+    nightelf: 'Night Elf',
+    gnome: 'Gnome',
+    orc: 'Orc',
+    undead: 'Undead',
+    tauren: 'Tauren',
+    troll: 'Troll',
+  }
+  return raceNames[race] || race
+}
+
+const toggleRace = (race: Race) => {
+  // Click to select/deselect race
+  if (selectedRace.value === race) {
+    selectedRace.value = undefined // Deselect
+  } else {
+    selectedRace.value = race // Select
+  }
+}
+
 const handleAssign = () => {
   if (canAssignRole(selectedClass.value, selectedRole.value)) {
     const tier = getCurrentTier()
-    emit('assignSlot', selectedClass.value, selectedRole.value, selectedTierType.value, tier)
+    emit('assignSlot', selectedClass.value, selectedRole.value, selectedTierType.value, tier, selectedRace.value)
     emit('close')
   }
 }
@@ -507,6 +572,7 @@ watch(
       selectedClass.value =
         props.currentSlot?.class || (props.isFirstSlot ? props.character.class : 'warrior')
       selectedTierType.value = props.currentSlot?.tierType || getDefaultTierType()
+      selectedRace.value = props.currentSlot?.race
       selectedLicenseType.value = {
         type: props.currentSlot?.tierType || 'R',
         tier: props.currentSlot?.tier || getHighestAvailableTier(),

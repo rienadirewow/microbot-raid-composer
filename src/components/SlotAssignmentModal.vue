@@ -216,15 +216,21 @@ const canAssignRole = (wowClass: WoWClass, role: Role): boolean => {
 }
 
 const getDefaultRole = (): Role => {
-  // For character slots, get the first available role from the class restrictions
+  // For character slots, use character's default role if set, otherwise use character class restrictions
   if (props.isFirstSlot) {
+    if (props.character.defaultRole) {
+      return props.character.defaultRole
+    }
     const allowedRoles = CLASS_ROLE_RESTRICTIONS[props.character.class] || []
     if (allowedRoles.length > 0) {
       return allowedRoles[0] as Role
     }
   }
 
-  // For companion slots, default to dps
+  // For companion slots, use character's default role if set, otherwise default to dps
+  if (props.character.defaultRole) {
+    return props.character.defaultRole
+  }
   return 'dps'
 }
 

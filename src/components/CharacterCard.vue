@@ -12,6 +12,14 @@
       <div class="flex items-center space-x-2">
         <h3 class="text-xl font-semibold text-gray-900 capitalize">{{ character.name }}</h3>
         <span class="text-sm text-gray-700">{{ character.class }}</span>
+        <button 
+          @click="cycleRole"
+          class="inline-flex items-center px-1.5 py-0.5 text-xs font-medium rounded-full transition-colors cursor-pointer border"
+          :class="getRoleBadgeClass(character.defaultRole)"
+          :title="character.defaultRole ? `Click to change role (${formatRoleName(character.defaultRole)})` : 'Click to set role'"
+        >
+          {{ character.defaultRole ? formatRoleName(character.defaultRole) : 'Set Role' }}
+        </button>
       </div>
 
       <!-- delete button -->
@@ -56,9 +64,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { PlayerCharacter, TierLevel } from '@/types'
+import { ref, computed } from 'vue'
+import type { PlayerCharacter, TierLevel, Role } from '@/types'
 import { getClassColor } from '@/data/classes'
+import { CLASS_ROLE_RESTRICTIONS } from '@/data/wow-data'
 import TierSelector from './forms/TierSelector.vue'
 
 // Props
@@ -73,11 +82,17 @@ const emit = defineEmits<{
   edit: [character: PlayerCharacter]
   delete: [characterId: string]
   'update:tiers': [characterId: string, tiers: { r: TierLevel; d: TierLevel }]
+  'update:role': [characterId: string, role: Role]
 }>()
 
 // Reactive state for inline editing
 const isEditing = ref(false)
 const editingTiers = ref({ ...props.character.unlockedTiers })
+
+// Computed
+const availableRoles = computed(() => {
+  return CLASS_ROLE_RESTRICTIONS[props.character.class] || []
+})
 
 // WoW gear quality colors for tiers
 const getTierColor = (tier: TierLevel, isUnlocked: boolean) => {
@@ -99,6 +114,37 @@ const getTierColor = (tier: TierLevel, isUnlocked: boolean) => {
 }
 
 // Methods
+const formatRoleName = (role: Role) => {
+  const roleNames: Record<Role, string> = {
+    tank: 'Tank',
+    healer: 'Healer', 
+    mdps: 'Melee DPS',
+    rdps: 'Ranged DPS',
+    dps: 'DPS'
+  }
+  return roleNames[role] || role
+}
+
+const getRoleBadgeClass = (role: Role | undefined) => {
+  if (!role) {
+    return 'bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200'
+  }
+  
+  const baseClasses = 'hover:opacity-80'
+  switch (role) {
+    case 'tank':
+      return `bg-blue-100 text-blue-800 border-blue-200 ${baseClasses}`
+    case 'healer':
+      return `bg-green-100 text-green-800 border-green-200 ${baseClasses}`
+    case 'mdps':
+    case 'rdps':
+    case 'dps':
+      return `bg-red-100 text-red-800 border-red-200 ${baseClasses}`
+    default:
+      return `bg-gray-100 text-gray-800 border-gray-200 ${baseClasses}`
+  }
+}
+
 const handleTierUpdate = (newTiers: { r: TierLevel; d: TierLevel }) => {
   isEditing.value = true
   editingTiers.value = newTiers
@@ -119,5 +165,23 @@ const cancelTierEdit = () => {
 const startEditing = () => {
   isEditing.value = true
   editingTiers.value = { ...props.character.unlockedTiers }
+}
+
+const cycleRole = () => {
+  const currentRole = props.character.defaultRole
+  
+  // If no role is set, start with the first available role for the class
+  if (!currentRole) {
+    if (availableRoles.value.length > 0) {
+      emit('update:role', props.character.id, availableRoles.value[0])
+    }
+    return
+  }
+  
+  const currentIndex = availableRoles.value.indexOf(currentRole)
+  const nextIndex = (currentIndex + 1) % availableRoles.value.length
+  const nextRole = availableRoles.value[nextIndex]
+  
+  emit('update:role', props.character.id, nextRole)
 }
 </script>

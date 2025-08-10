@@ -48,6 +48,7 @@
         </option>
       </SelectField>
 
+
       <!-- Licenses -->
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2"> Licenses </label>
@@ -98,9 +99,10 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
-import type { PlayerCharacter, Faction, Race, WoWClass, TierLevel } from '@/types'
+import type { PlayerCharacter, Faction, Race, WoWClass, TierLevel, Role } from '@/types'
 import {
   CLASS_RACE_RESTRICTIONS,
+  CLASS_DEFAULT_ROLES,
   validateClassRace,
   ALLIANCE_RACES,
   HORDE_RACES,
@@ -147,6 +149,7 @@ const availableClasses = computed(() => {
     validateClassRace(wowClass as WoWClass, form.value.race),
   ) as WoWClass[]
 })
+
 
 const RAID_TIERS: TierLevel[] = [0, 1, 2, 3, 4, 5]
 const DUNGEON_TIERS: TierLevel[] = [0, 1, 2, 3, 4, 5]
@@ -227,12 +230,13 @@ const formatRaceName = (race: string) => {
   return race.charAt(0).toUpperCase() + race.slice(1).replace(/([A-Z])/g, ' $1')
 }
 
+
 const handleRaceChange = () => {
   form.value.class = '' as WoWClass
 }
 
 const handleClassChange = () => {
-  // Validation could be added here
+  // Reset validation errors when class changes
 }
 
 const validateForm = (): boolean => {
@@ -257,6 +261,7 @@ const validateForm = (): boolean => {
     }
   }
 
+
   return Object.keys(errors.value).length === 0
 }
 
@@ -277,6 +282,7 @@ const handleSubmit = async () => {
       faction,
       race: form.value.race,
       class: form.value.class,
+      defaultRole: CLASS_DEFAULT_ROLES[form.value.class],
       level: 60,
       unlockedTiers: form.value.unlockedTiers,
     }

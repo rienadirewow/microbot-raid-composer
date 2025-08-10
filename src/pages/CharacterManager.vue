@@ -51,6 +51,7 @@
             @edit="editCharacter"
             @delete="deleteCharacter"
             @update:tiers="updateCharacterTiers"
+            @update:role="updateCharacterRole"
           />
         </div>
       </CharacterList>
@@ -68,7 +69,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import type { PlayerCharacter, TierLevel } from '@/types'
+import type { PlayerCharacter, TierLevel, Role } from '@/types'
 import { useCharactersStore } from '@/stores/characters'
 import CharacterCard from '../components/CharacterCard.vue'
 import CharacterForm from '../components/forms/CharacterForm.vue'
@@ -133,6 +134,15 @@ const updateCharacterTiers = async (characterId: string, tiers: { r: TierLevel; 
   } catch (error) {
     console.error('Failed to update character tiers:', error)
     alert('Failed to update character tiers. Please try again.')
+  }
+}
+
+const updateCharacterRole = async (characterId: string, role: Role) => {
+  try {
+    await charactersStore.updateCharacterRole(characterId, role)
+  } catch (error) {
+    console.error('Failed to update character role:', error)
+    alert('Failed to update character role. Please try again.')
   }
 }
 </script>

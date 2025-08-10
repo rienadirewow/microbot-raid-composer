@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
-import type { PlayerCharacter, Faction, TierLevel } from '@/types'
+import type { PlayerCharacter, Faction, TierLevel, Role } from '@/types'
 import { useStorage } from '@/composables/useStorage'
+import { CLASS_DEFAULT_ROLES } from '@/data/wow-data'
 
 export const useCharactersStore = defineStore('characters', () => {
   const characters = ref<PlayerCharacter[]>([])
@@ -11,7 +12,28 @@ export const useCharactersStore = defineStore('characters', () => {
   const loadCharacters = async () => {
     try {
       const stored = await getPlayerCharacters()
-      characters.value = stored || []
+      let loadedCharacters = stored || []
+      
+      // Migration: Add default roles to existing characters that don't have them
+      let needsSave = false
+      loadedCharacters = loadedCharacters.map(character => {
+        if (!character.defaultRole && character.class) {
+          needsSave = true
+          return {
+            ...character,
+            defaultRole: CLASS_DEFAULT_ROLES[character.class]
+          }
+        }
+        return character
+      })
+      
+      characters.value = loadedCharacters
+      
+      // Save migrated data if needed
+      if (needsSave) {
+        await setPlayerCharacters(characters.value)
+        console.log('Migrated character default roles')
+      }
     } catch (error) {
       console.error('Failed to load characters:', error)
       characters.value = []
@@ -58,6 +80,17 @@ export const useCharactersStore = defineStore('characters', () => {
     throw new Error('Character not found')
   }
 
+  // Update character default role only
+  const updateCharacterRole = async (id: string, role: Role) => {
+    const index = characters.value.findIndex((c) => c.id === id)
+    if (index !== -1) {
+      characters.value[index] = { ...characters.value[index], defaultRole: role }
+      await setPlayerCharacters(characters.value)
+      return characters.value[index]
+    }
+    throw new Error('Character not found')
+  }
+
   // Delete a character
   const deleteCharacter = async (id: string) => {
     const index = characters.value.findIndex((c) => c.id === id)
@@ -97,6 +130,7 @@ export const useCharactersStore = defineStore('characters', () => {
     addCharacter,
     updateCharacter,
     updateCharacterTiers,
+    updateCharacterRole,
     deleteCharacter,
     getCharacterById,
 

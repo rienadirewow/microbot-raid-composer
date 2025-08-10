@@ -70,14 +70,13 @@
             v-for="wowClass in availableClasses"
             :key="wowClass"
             @click="handleClassSelect(wowClass)"
-            :disabled="!canAssignRole(wowClass, selectedRole)"
-            class="p-4 rounded-lg border-2 text-left transition-all duration-200 hover:shadow-md"
+            class="p-4 rounded-lg border-2 text-left transition-all duration-200 hover:shadow-md cursor-pointer"
             :class="
               selectedClass === wowClass
                 ? 'border-blue-500'
                 : canAssignRole(wowClass, selectedRole)
                   ? 'border-gray-300 hover:border-gray-400'
-                  : 'border-gray-200 cursor-not-allowed opacity-50'
+                  : 'border-gray-200 opacity-50 hover:opacity-70'
             "
             :style="{
               backgroundColor: getClassButtonBackground(wowClass),
@@ -357,13 +356,16 @@ const handleClassSelect = (wowClass: WoWClass) => {
     return
   }
 
+  const classRoles = CLASS_ROLE_RESTRICTIONS[wowClass] || []
+  
+  // Check if this class was disabled (doesn't support current role)
+  const wasDisabled = !classRoles.includes(selectedRole.value)
+  
   selectedClass.value = wowClass
 
-  // Update role selection based on the new class
-  const classRoles = CLASS_ROLE_RESTRICTIONS[wowClass] || []
-
-  // If current role is not available for the new class, switch to the class's default role
-  if (!classRoles.includes(selectedRole.value)) {
+  // If the class was disabled (grayed out), always switch to the class's default role
+  // Otherwise, only switch if the current role is not available
+  if (wasDisabled || !classRoles.includes(selectedRole.value)) {
     const defaultRole = CLASS_DEFAULT_ROLES[wowClass]
     if (defaultRole && classRoles.includes(defaultRole)) {
       selectedRole.value = defaultRole

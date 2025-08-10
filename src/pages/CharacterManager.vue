@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-6xl mx-auto p-6">
+  <div class="max-w-6xl mx-auto p-4">
     <!-- Loading State -->
     <LoadingState v-if="isLoading" message="Loading characters..." />
 

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-white rounded-lg shadow p-4 border border-gray-200 hover:border-gray-300 transition-colors cursor-pointer"
+    class="bg-white rounded-lg shadow p-3 border border-gray-200 hover:border-gray-300 transition-colors cursor-pointer"
     @click="$emit('click')"
   >
     <div class="flex items-center justify-between mb-2">

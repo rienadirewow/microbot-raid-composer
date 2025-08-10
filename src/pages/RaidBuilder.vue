@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-6xl mx-auto p-6">
+  <div class="max-w-6xl mx-auto p-4">
     <!-- Header -->
     <PageHeader title="Raids" description="Create and manage your WoW Classic raid compositions">
       <template #action>
@@ -8,9 +8,9 @@
     </PageHeader>
 
     <!-- Combined Raid Container -->
-    <div v-if="raidsStore.currentRaid" class="bg-white rounded-lg shadow p-6">
+    <div v-if="raidsStore.currentRaid" class="bg-white rounded-lg shadow p-4">
       <!-- Line 1: Raid Name and Actions -->
-      <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center justify-between mb-3">
         <div class="flex items-center space-x-2">
           <div v-if="!isEditing" class="flex items-center space-x-2">
             <h2 class="text-xl font-semibold text-gray-900">{{ raidsStore.currentRaid.name }}</h2>
@@ -76,7 +76,7 @@
       </div>
 
       <!-- Line 2: Progress and Role Distribution -->
-      <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center justify-between mb-3">
         <div class="flex items-center space-x-4">
           <ProgressBar :value="totalFilledSlots" :max="40" />
           <div class="text-sm text-slate-600">
@@ -86,7 +86,7 @@
         </div>
         <div class="flex items-center space-x-4">
           <!-- Tank Counter -->
-          <div class="flex items-center px-3 py-2 rounded-lg border transition-colors" 
+          <div class="flex items-center px-2 py-1.5 rounded-lg border transition-colors" 
                :class="getRoleCounterClass('tank')">
             <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
@@ -98,7 +98,7 @@
           </div>
           
           <!-- Healer Counter -->
-          <div class="flex items-center px-3 py-2 rounded-lg border transition-colors" 
+          <div class="flex items-center px-2 py-1.5 rounded-lg border transition-colors" 
                :class="getRoleCounterClass('healer')">
             <svg class="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
@@ -110,7 +110,7 @@
           </div>
           
           <!-- DPS Counter -->
-          <div class="flex items-center px-3 py-2 rounded-lg border transition-colors" 
+          <div class="flex items-center px-2 py-1.5 rounded-lg border transition-colors" 
                :class="getRoleCounterClass('dps')">
             <svg class="w-5 h-5 mr-2 text-red-600" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -124,7 +124,7 @@
       </div>
 
       <!-- Line 3: Current Player and Export -->
-      <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center justify-between mb-4">
         <div class="flex items-center">
           <button
             @click="showPlayerSelector = true"
@@ -177,7 +177,7 @@
       </div>
 
       <!-- Current Player Warning -->
-      <div class="mb-6">
+      <div class="mb-4">
         <div v-if="!currentPlayer" class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
           <div class="flex items-center">
             <svg class="w-5 h-5 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">

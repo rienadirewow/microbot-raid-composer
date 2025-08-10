@@ -1,6 +1,6 @@
 <template>
   <div
-    class="rounded-lg py-2 px-4 border-2 transition-colors"
+    class="rounded-lg py-1.5 px-3 border-2 transition-colors"
     :class="[
       character.faction === 'alliance' ? 'border-blue-600' : 'border-red-600',
       'hover:border-opacity-75',
@@ -8,10 +8,10 @@
     :style="{ backgroundColor: getClassColor(character.class) }"
   >
     <!-- Character Info -->
-    <div class="flex items-center space-x-3 mb-2">
+    <div class="flex items-center space-x-3 mb-1.5">
       <div class="flex items-center space-x-2">
-        <h3 class="text-xl font-semibold text-gray-900 capitalize">{{ character.name }}</h3>
-        <span class="text-sm text-gray-700">{{ character.class }}</span>
+        <h3 class="text-lg font-semibold text-gray-900 capitalize">{{ character.name }}</h3>
+        <span class="text-xs text-gray-700">{{ character.class }}</span>
         <button 
           @click="cycleRole"
           class="inline-flex items-center px-1.5 py-0.5 text-xs font-medium rounded-full transition-colors cursor-pointer border"
@@ -25,10 +25,10 @@
       <!-- delete button -->
       <button
         @click="$emit('delete', character.id)"
-        class="ml-auto p-2 text-gray-700 hover:text-red-600 hover:bg-red-200 rounded-lg transition-colors cursor-pointer"
+        class="ml-auto p-1.5 text-gray-700 hover:text-red-600 hover:bg-red-200 rounded-lg transition-colors cursor-pointer"
         title="Delete character"
       >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -40,11 +40,11 @@
     </div>
 
     <!-- Tier Progression -->
-    <div class="mb-3">
+    <div class="mb-1">
       <!-- Inline Tier Editor -->
-      <div class="space-y-2">
+      <div class="space-y-1.5">
         <TierSelector v-model="editingTiers" @update:modelValue="handleTierUpdate" />
-        <div v-if="isEditing" class="flex items-center justify-end space-x-2 mt-1 -mb-2">
+        <div v-if="isEditing" class="flex items-center justify-end space-x-2 mt-1">
           <button
             @click="cancelTierEdit"
             class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"

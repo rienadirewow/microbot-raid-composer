@@ -1,6 +1,6 @@
 <template>
   <div class="p-0">
-    <div class="space-y-4">
+    <div class="space-y-3">
       <RaidRow
         v-for="(row, rowIndex) in sortedComposition"
         :key="row.character.id"

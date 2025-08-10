@@ -1,14 +1,14 @@
 <template>
   <div
     @click="$emit('click')"
-    class="flex-shrink-0 border rounded-xl p-3 transition-all duration-200 cursor-pointer hover:shadow-md overflow-hidden relative"
+    class="flex-shrink-0 border rounded-lg p-2 transition-all duration-200 cursor-pointer hover:shadow-md overflow-hidden relative"
     :class="slotClasses"
     :style="{ backgroundColor: getBackgroundColor() }"
   >
     <!-- Role badge in top right -->
     <div
       v-if="slot?.role"
-      class="absolute top-2 right-2 px-1.5 py-0.5 text-xs font-medium rounded-full"
+      class="absolute top-1 right-1 px-1 py-0.5 text-xs font-medium rounded-full"
       :class="getRoleBadgeClass(slot.role)"
     >
       {{ getRoleDisplayName(slot.role) }}
@@ -16,7 +16,7 @@
 
     <div class="flex items-start justify-between h-full">
       <div class="flex-1 min-w-0">
-        <div class="font-semibold text-base truncate" :style="{ color: getDisplayNameColor() }">
+        <div class="font-semibold text-sm truncate" :style="{ color: getDisplayNameColor() }">
           {{ displayName }}
         </div>
         <div class="text-xs font-medium truncate" :style="{ color: getTierTextColor() }">

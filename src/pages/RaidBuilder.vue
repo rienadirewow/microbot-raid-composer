@@ -80,8 +80,9 @@
         <div class="flex items-center space-x-4">
           <ProgressBar :value="totalFilledSlots" :max="40" />
           <div class="text-sm text-slate-600">
-            <span class="font-medium">{{ totalFilledSlots }}/40</span>
-            <span v-if="currentPlayer" class="text-amber-600 ml-2">(+1 current player)</span>
+            <span class="font-medium" :class="{ 'text-green-600': totalFilledSlots >= 40 }">{{ totalFilledSlots }}/40</span>
+            <span v-if="totalFilledSlots >= 40" class="text-green-600 ml-2 font-semibold">Raid Full!</span>
+            <span v-else-if="currentPlayer" class="text-amber-600 ml-2">(includes current player)</span>
           </div>
         </div>
         <div class="flex items-center space-x-4">
@@ -423,11 +424,18 @@ const roleCounts = computed(() => {
 })
 
 const suggestedRoles = computed(() => {
-  const groupCount = composition.value.length
+  const totalSlots = totalFilledSlots.value
+  
+  // Standard raid composition ratios based on total filled slots
+  // Approximately: 10% tanks, 25% healers, 65% dps
+  const tanks = Math.max(1, Math.ceil(totalSlots * 0.1)) // At least 1 tank, ~10% of raid
+  const healers = Math.max(1, Math.ceil(totalSlots * 0.25)) // At least 1 healer, ~25% of raid  
+  const dps = Math.max(0, totalSlots - tanks - healers) // Remaining slots for dps
+  
   return {
-    tank: Math.ceil(groupCount / 2), // 1 tank per 2 groups
-    healer: groupCount + 1, // 1 healer per group + 1
-    dps: groupCount * 5 - Math.ceil(groupCount / 2) - (groupCount + 1), // rest dps
+    tank: tanks,
+    healer: healers,
+    dps: dps,
   }
 })
 
@@ -585,8 +593,17 @@ const initializeCharacterGroupsForNewRaid = () => {
   console.log('Initializing character groups for NEW raid...')
   console.log('Characters:', charactersStore.characters)
 
+  // Calculate max characters we can include based on raid limit
+  const maxRaidSize = 40
+  const currentPlayerCount = currentPlayerId.value ? 1 : 0
+  const maxAvailableSlots = maxRaidSize - currentPlayerCount
+  
+  // Since each character starts with 1 lite by default, we can include at most maxAvailableSlots characters
+  // This ensures we don't exceed the raid size limit even with just lite characters
+  const charactersToInclude = charactersStore.characters.slice(0, Math.min(maxAvailableSlots, charactersStore.characters.length))
+
   // Initialize with empty slots and include lite characters by default
-  composition.value = charactersStore.characters.map((character) => {
+  composition.value = charactersToInclude.map((character) => {
     const slots: (PlayerSlot | null)[] = Array(5).fill(null)
 
     // Auto-assign first slot as lite character (free clone)
@@ -609,7 +626,7 @@ const initializeCharacterGroupsForNewRaid = () => {
     }
   })
 
-  console.log('Final composition for new raid:', composition.value)
+  console.log(`Final composition for new raid: ${composition.value.length} character groups (${composition.value.length + currentPlayerCount} total slots used)`)
 }
 
 const initializeCharacterGroups = () => {
@@ -710,6 +727,27 @@ const canAssignRole = (wowClass: string, role: string): boolean => {
 }
 
 const handleSlotClick = (rowIndex: number, slotIndex: number) => {
+  const slot = composition.value[rowIndex]?.slots[slotIndex]
+  
+  // If slot is already filled, allow editing
+  if (slot) {
+    assignmentModal.value = {
+      isOpen: true,
+      rowIndex,
+      slotIndex,
+    }
+    return
+  }
+  
+  // Check if raid is full (40 including current player, 39 without)
+  const maxRaidSize = 40
+  const currentTotal = totalFilledSlots.value
+  
+  if (currentTotal >= maxRaidSize) {
+    alert(`Raid is full! Maximum size is ${maxRaidSize} (including current player).`)
+    return
+  }
+  
   assignmentModal.value = {
     isOpen: true,
     rowIndex,

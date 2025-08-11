@@ -184,8 +184,8 @@ const getTierTextColor = () => {
 }
 
 const getTierDisplayName = () => {
-  if (!props.slot) {
-    return `R:T${props.character.unlockedTiers.r} D:T${props.character.unlockedTiers.d}`
+  if (!props.slot || props.slot.isCharacter) {
+    return `T${props.character.unlockedTiers.r}R/T${props.character.unlockedTiers.d}D`
   }
 
   const tierName = `T${props.slot.tier}`

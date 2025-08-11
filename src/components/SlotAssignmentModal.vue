@@ -215,6 +215,11 @@ const canAssignRole = (wowClass: WoWClass, role: Role): boolean => {
 }
 
 const getDefaultRole = (): Role => {
+  // Add null check for character
+  if (!props.character) {
+    return 'dps'
+  }
+
   // For character slots, use character's default role if set, otherwise use character class restrictions
   if (props.isFirstSlot) {
     if (props.character.defaultRole) {
@@ -231,6 +236,11 @@ const getDefaultRole = (): Role => {
 }
 
 const getDefaultTierType = (): TierType => {
+  // Add null check for character
+  if (!props.character) {
+    return 'R'
+  }
+  
   // Default to the license type with the higher tier
   if (props.character.unlockedTiers.r >= props.character.unlockedTiers.d) {
     return 'R'
@@ -240,6 +250,11 @@ const getDefaultTierType = (): TierType => {
 }
 
 const getHighestAvailableTier = (): TierLevel => {
+  // Add null check for character
+  if (!props.character) {
+    return 0
+  }
+
   // For first slot (character), use the character's highest tier
   if (props.isFirstSlot) {
     return Math.max(props.character.unlockedTiers.r, props.character.unlockedTiers.d) as TierLevel
@@ -252,7 +267,7 @@ const getHighestAvailableTier = (): TierLevel => {
 // State
 const selectedRole = ref<Role>(props.currentSlot?.role || getDefaultRole())
 const selectedClass = ref<WoWClass>(
-  props.currentSlot?.class || (props.isFirstSlot ? props.character.class : 'warrior'),
+  props.currentSlot?.class || (props.isFirstSlot && props.character ? props.character.class : 'warrior'),
 )
 const selectedTierType = ref<TierType>(props.currentSlot?.tierType || getDefaultTierType())
 const selectedRace = ref<Race | undefined>(props.currentSlot?.race)
@@ -265,12 +280,15 @@ const selectedLicenseType = ref<{ type: TierType; tier: TierLevel }>({
 
 // Computed
 const modalTitle = computed(() => {
+  if (!props.character) {
+    return 'Configure Slot'
+  }
   return `Configure ${props.isFirstSlot ? props.character.name : `${props.character.name}'s Group Member`}`
 })
 
 const roleButtons = computed(() => {
   // For character slots (first slot), show only roles the character's class can fulfill
-  if (props.isFirstSlot) {
+  if (props.isFirstSlot && props.character) {
     const characterClass = props.character.class
     const allowedRoles = CLASS_ROLE_RESTRICTIONS[characterClass] || []
 
@@ -330,6 +348,11 @@ const availableClasses = computed(() => {
     'warlock',
     'druid',
   ]
+  
+  if (!props.character) {
+    return allClasses
+  }
+  
   return allClasses.filter((cls) => {
     // Filter based on faction restrictions
     if (cls === 'paladin' && props.character.faction !== 'alliance') return false
@@ -340,6 +363,11 @@ const availableClasses = computed(() => {
 
 const availableRaces = computed(() => {
   const classRaces = CLASS_RACE_RESTRICTIONS[selectedClass.value] || []
+  
+  if (!props.character) {
+    return classRaces
+  }
+  
   // Filter by character faction (parent character determines available races)
   if (props.character.faction === 'alliance') {
     return classRaces.filter(race => ALLIANCE_RACES.includes(race as any))
@@ -406,7 +434,8 @@ watch(selectedClass, (newClass) => {
 
 const availableRaidTiers = computed(() => {
   const tiers: TierLevel[] = []
-  for (let i = 0; i <= props.character.unlockedTiers.r; i++) {
+  const maxTier = props.character ? props.character.unlockedTiers.r : 5
+  for (let i = 0; i <= maxTier; i++) {
     tiers.push(i as TierLevel)
   }
   return tiers
@@ -414,7 +443,8 @@ const availableRaidTiers = computed(() => {
 
 const availableDungeonTiers = computed(() => {
   const tiers: TierLevel[] = []
-  for (let i = 0; i <= props.character.unlockedTiers.d; i++) {
+  const maxTier = props.character ? props.character.unlockedTiers.d : 5
+  for (let i = 0; i <= maxTier; i++) {
     tiers.push(i as TierLevel)
   }
   return tiers
@@ -470,7 +500,7 @@ const getClassColor = (wowClass: string) => {
 }
 
 const getCurrentTier = () => {
-  if (props.isFirstSlot) {
+  if (props.isFirstSlot && props.character) {
     return selectedTierType.value === 'R'
       ? props.character.unlockedTiers.r
       : props.character.unlockedTiers.d
@@ -578,7 +608,7 @@ watch(
       // Reset modal state when opening
       selectedRole.value = props.currentSlot?.role || getDefaultRole()
       selectedClass.value =
-        props.currentSlot?.class || (props.isFirstSlot ? props.character.class : 'warrior')
+        props.currentSlot?.class || (props.isFirstSlot && props.character ? props.character.class : 'warrior')
       selectedTierType.value = props.currentSlot?.tierType || getDefaultTierType()
       selectedRace.value = props.currentSlot?.race
       selectedLicenseType.value = {

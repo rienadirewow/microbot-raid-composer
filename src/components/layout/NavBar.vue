@@ -14,25 +14,25 @@
             class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
             :class="{ 'text-blue-600 bg-blue-50': $route.path === '/' }"
           >
-            Raid Builder
+            Raid Builder ({{ raidsStore.raids.length }})
           </router-link>
           <router-link
             to="/characters"
             class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
             :class="{ 'text-blue-600 bg-blue-50': $route.path === '/characters' }"
           >
-            Characters
+            Characters ({{ charactersStore.totalCharacters }})
           </router-link>
         </div>
 
         <!-- User Menu -->
         <div v-if="supabaseUser" class="flex items-center space-x-4">
-          <!-- Character Count Badge -->
+          <!-- Character Count Badge
           <div class="hidden sm:flex items-center space-x-2 text-sm text-gray-600">
             <span>{{ charactersStore.totalCharacters }} characters</span>
             <span class="text-gray-300">|</span>
             <span>{{ raidsStore.raids.length }} raids</span>
-          </div>
+          </div> -->
 
           <!-- User Info and Actions -->
           <div class="flex items-center space-x-2">
@@ -40,7 +40,7 @@
               {{ supabaseUser.email || 'Guest User' }}
             </span>
 
-            <!-- Sign Up button for guest users -->
+            <!-- Sign Up button for guest users - disabled for now
             <Button
               v-if="supabaseUser && supabaseUser.is_anonymous"
               size="sm"
@@ -48,6 +48,7 @@
             >
               Sign Up
             </Button>
+            -->
 
             <Button variant="secondary" size="sm" @click="signOut"> Sign Out </Button>
           </div>
@@ -95,7 +96,7 @@
     </div>
 
     <!-- Sign Up Modal -->
-    <GuestSignupModal 
+    <GuestSignupModal
       :show="showSignUpModal"
       @close="showSignUpModal = false"
       @success="handleSignupSuccess"
@@ -129,7 +130,6 @@ watch(supabaseUser, (user) => {})
 const handleSignupSuccess = () => {
   showSignUpModal.value = false
 }
-
 
 // Watch for user changes to detect when email verification is completed
 watch(supabaseUser, async (newUser, oldUser) => {

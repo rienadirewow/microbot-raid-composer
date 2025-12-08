@@ -37,25 +37,27 @@
       <!-- Role Selection -->
       <div>
         <h3 class="text-lg font-bold text-slate-800 mb-3">Select Role</h3>
-        <div class="flex space-x-3">
+        <div class="flex flex-wrap gap-3">
           <button
             v-for="roleButton in roleButtons"
             :key="roleButton.role"
-            @click="selectedRole = roleButton.role"
-            class="flex items-center px-4 py-2 rounded-lg font-semibold transition-all duration-200 hover:shadow-md border-2"
-            :class="
-              selectedRole === roleButton.role
-                ? 'bg-blue-50 border-blue-500 text-blue-700'
-                : 'bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200'
-            "
+            @click="handleRoleSelect(roleButton.role, roleButton.isEnabled)"
+            class="flex items-center px-4 py-2 rounded-lg font-semibold transition-all duration-200 border-2 cursor-pointer"
+            :class="[
+              !roleButton.isEnabled
+                ? 'bg-gray-100 text-gray-400 border-transparent opacity-50 hover:opacity-75'
+                : selectedRole === roleButton.role
+                  ? 'bg-blue-50 border-blue-500 text-blue-700 hover:shadow-md'
+                  : 'bg-gray-100 text-gray-700 border-transparent hover:bg-gray-200 hover:shadow-md'
+            ]"
             :style="{
-              borderColor: selectedRole === roleButton.role ? roleButton.color : 'transparent',
+              borderColor: roleButton.isEnabled && selectedRole === roleButton.role ? roleButton.color : 'transparent',
             }"
           >
             <component
               :is="roleButton.icon"
               class="h-4 w-4 mr-2"
-              :style="{ color: roleButton.color }"
+              :style="{ color: roleButton.isEnabled ? roleButton.color : '#9CA3AF' }"
             />
             {{ getRoleDisplayName(roleButton.role) }}
           </button>
@@ -214,25 +216,20 @@ const canAssignRole = (wowClass: WoWClass, role: Role): boolean => {
   return allowedRoles.includes(role)
 }
 
-const getDefaultRole = (): Role => {
-  // Add null check for character
+const getDefaultRole = (wowClass?: WoWClass): Role => {
   if (!props.character) {
-    return 'dps'
+    return 'mdps'
   }
 
-  // For character slots, use character's default role if set, otherwise use character class restrictions
   if (props.isFirstSlot) {
     if (props.character.defaultRole) {
       return props.character.defaultRole
     }
-    const allowedRoles = CLASS_ROLE_RESTRICTIONS[props.character.class] || []
-    if (allowedRoles.length > 0) {
-      return allowedRoles[0] as Role
-    }
+    return CLASS_DEFAULT_ROLES[props.character.class] || 'mdps'
   }
 
-  // For companion slots, default to dps (companions should not inherit character's role)
-  return 'dps'
+  const classToUse = wowClass || 'warrior'
+  return CLASS_DEFAULT_ROLES[classToUse] || 'mdps'
 }
 
 const getDefaultTierType = (): TierType => {
@@ -264,13 +261,40 @@ const getHighestAvailableTier = (): TierLevel => {
   return Math.max(props.character.unlockedTiers.r, props.character.unlockedTiers.d) as TierLevel
 }
 
+const getInitialClass = (): WoWClass => {
+  return props.currentSlot?.class || (props.isFirstSlot && props.character ? props.character.class : 'warrior')
+}
+
+const getInitialRace = (wowClass: WoWClass): Race | undefined => {
+  if (props.currentSlot?.race) return props.currentSlot.race
+  if (props.isFirstSlot) return undefined
+  if (!props.character) return undefined
+
+  const faction = props.character.faction
+  if (faction === 'alliance') {
+    switch (wowClass) {
+      case 'warrior': return 'human'
+      case 'rogue': return 'human'
+      case 'priest': return 'dwarf'
+      case 'mage':
+      case 'warlock': return 'gnome'
+      default: return undefined
+    }
+  } else if (faction === 'horde') {
+    switch (wowClass) {
+      case 'warrior': return 'orc'
+      default: return undefined
+    }
+  }
+  return undefined
+}
+
 // State
-const selectedRole = ref<Role>(props.currentSlot?.role || getDefaultRole())
-const selectedClass = ref<WoWClass>(
-  props.currentSlot?.class || (props.isFirstSlot && props.character ? props.character.class : 'warrior'),
-)
+const initialClass = getInitialClass()
+const selectedRole = ref<Role>(props.currentSlot?.role || getDefaultRole(initialClass))
+const selectedClass = ref<WoWClass>(initialClass)
 const selectedTierType = ref<TierType>(props.currentSlot?.tierType || getDefaultTierType())
-const selectedRace = ref<Race | undefined>(props.currentSlot?.race)
+const selectedRace = ref<Race | undefined>(getInitialRace(initialClass))
 
 // License type selection state
 const selectedLicenseType = ref<{ type: TierType; tier: TierLevel }>({
@@ -286,54 +310,70 @@ const modalTitle = computed(() => {
   return `Configure ${props.isFirstSlot ? props.character.name : `${props.character.name}'s Group Member`}`
 })
 
+const getRoleButtonConfig = (role: Role, isEnabled: boolean) => {
+  const baseConfig = (() => {
+    switch (role) {
+      case 'tank':
+        return { role, icon: ShieldIcon, color: '#3B82F6' }
+      case 'healer':
+        return { role, icon: HeartIcon, color: '#10B981' }
+      case 'mdps':
+      case 'rdps':
+      case 'dps':
+        return { role, icon: SwordIcon, color: '#EF4444' }
+      case 'frost':
+        return { role, icon: SwordIcon, color: '#69CCF0' }
+      case 'fire':
+        return { role, icon: SwordIcon, color: '#FF7D0A' }
+      case 'arcane':
+        return { role, icon: SwordIcon, color: '#9482C9' }
+      case 'magic':
+        return { role, icon: SwordIcon, color: '#F58CBA' }
+      case 'might':
+        return { role, icon: SwordIcon, color: '#C79C6E' }
+      default:
+        return { role, icon: SwordIcon, color: '#EF4444' }
+    }
+  })()
+  return { ...baseConfig, isEnabled }
+}
+
 const roleButtons = computed(() => {
-  // For character slots (first slot), show only roles the character's class can fulfill
-  if (props.isFirstSlot && props.character) {
-    const characterClass = props.character.class
-    const allowedRoles = CLASS_ROLE_RESTRICTIONS[characterClass] || []
+  const currentClass = props.isFirstSlot && props.character
+    ? props.character.class
+    : selectedClass.value
+  const allowedRoles = CLASS_ROLE_RESTRICTIONS[currentClass] || []
 
-    return allowedRoles.map((role) => {
-      switch (role) {
-        case 'tank':
-          return { role: 'tank' as Role, icon: ShieldIcon, color: '#3B82F6' }
-        case 'healer':
-          return { role: 'healer' as Role, icon: HeartIcon, color: '#10B981' }
-        case 'dps':
-          return { role: 'dps' as Role, icon: SwordIcon, color: '#EF4444' }
-        case 'mdps':
-          return { role: 'mdps' as Role, icon: SwordIcon, color: '#EF4444' }
-        case 'rdps':
-          return { role: 'rdps' as Role, icon: SwordIcon, color: '#EF4444' }
-        default:
-          return { role: 'dps' as Role, icon: SwordIcon, color: '#EF4444' }
-      }
+  const flavoredDpsRoles: Role[] = ['frost', 'fire', 'arcane', 'magic', 'might']
+  const hasFlavoredDps = allowedRoles.some(r => flavoredDpsRoles.includes(r))
+  const classFlavorRoles = allowedRoles.filter(r => flavoredDpsRoles.includes(r))
+
+  const buttons: { role: Role; icon: any; color: string; isEnabled: boolean }[] = []
+
+  buttons.push(getRoleButtonConfig('tank', allowedRoles.includes('tank')))
+  buttons.push(getRoleButtonConfig('healer', allowedRoles.includes('healer')))
+
+  if (hasFlavoredDps) {
+    classFlavorRoles.forEach(role => {
+      buttons.push(getRoleButtonConfig(role, true))
     })
-  }
-
-  // For companion/group member slots, show dynamic roles based on selected class
-  const selectedClassRoles = CLASS_ROLE_RESTRICTIONS[selectedClass.value] || []
-
-  // If the selected class has specific dps roles (mdps/rdps), show those instead of generic dps
-  const hasSpecificDps = selectedClassRoles.includes('mdps') || selectedClassRoles.includes('rdps')
-
-  const baseRoles = [
-    { role: 'tank' as Role, icon: ShieldIcon, color: '#3B82F6' },
-    { role: 'healer' as Role, icon: HeartIcon, color: '#10B981' },
-  ]
-
-  // Add appropriate dps role(s)
-  if (hasSpecificDps) {
-    if (selectedClassRoles.includes('mdps')) {
-      baseRoles.push({ role: 'mdps' as Role, icon: SwordIcon, color: '#EF4444' })
-    }
-    if (selectedClassRoles.includes('rdps')) {
-      baseRoles.push({ role: 'rdps' as Role, icon: SwordIcon, color: '#EF4444' })
-    }
   } else {
-    baseRoles.push({ role: 'dps' as Role, icon: SwordIcon, color: '#EF4444' })
+    const hasMdps = allowedRoles.includes('mdps')
+    const hasRdps = allowedRoles.includes('rdps')
+    const hasDps = allowedRoles.includes('dps')
+
+    if (hasMdps && hasRdps) {
+      buttons.push(getRoleButtonConfig('mdps', true))
+      buttons.push(getRoleButtonConfig('rdps', true))
+    } else if (hasMdps || hasRdps || hasDps) {
+      const dpsRole = hasMdps ? 'mdps' : hasRdps ? 'rdps' : 'dps'
+      buttons.push(getRoleButtonConfig(dpsRole, true))
+    } else {
+      buttons.push(getRoleButtonConfig('dps', false))
+    }
   }
 
-  return baseRoles
+  return buttons
 })
 
 const availableClasses = computed(() => {
@@ -363,11 +403,11 @@ const availableClasses = computed(() => {
 
 const availableRaces = computed(() => {
   const classRaces = CLASS_RACE_RESTRICTIONS[selectedClass.value] || []
-  
+
   if (!props.character) {
     return classRaces
   }
-  
+
   // Filter by character faction (parent character determines available races)
   if (props.character.faction === 'alliance') {
     return classRaces.filter(race => ALLIANCE_RACES.includes(race as any))
@@ -377,6 +417,69 @@ const availableRaces = computed(() => {
   return classRaces
 })
 
+const getDefaultRaceForClass = (wowClass: WoWClass): Race | undefined => {
+  if (!props.character) return undefined
+  const faction = props.character.faction
+
+  if (faction === 'alliance') {
+    switch (wowClass) {
+      case 'warrior':
+        return 'human'
+      case 'rogue':
+        return 'human'
+      case 'priest':
+        return 'dwarf'
+      case 'mage':
+      case 'warlock':
+        return 'gnome'
+      default:
+        return undefined
+    }
+  } else if (faction === 'horde') {
+    switch (wowClass) {
+      case 'warrior':
+        return 'orc'
+      default:
+        return undefined
+    }
+  }
+  return undefined
+}
+
+const getDefaultClassForRole = (role: Role): WoWClass => {
+  if (!props.character) return 'warrior'
+  const faction = props.character.faction
+
+  const dpsRoles: Role[] = ['dps', 'mdps', 'rdps', 'frost', 'fire', 'arcane', 'magic', 'might']
+
+  if (role === 'tank') {
+    return 'warrior'
+  } else if (role === 'healer') {
+    return faction === 'alliance' ? 'paladin' : 'shaman'
+  } else if (dpsRoles.includes(role)) {
+    return 'warrior'
+  }
+  return 'warrior'
+}
+
+const handleRoleSelect = (role: Role, isEnabled: boolean) => {
+  if (props.isFirstSlot) {
+    if (isEnabled) {
+      selectedRole.value = role
+    }
+    return
+  }
+
+  if (isEnabled) {
+    selectedRole.value = role
+  } else {
+    const newClass = getDefaultClassForRole(role)
+    selectedClass.value = newClass
+    selectedRole.value = role
+    selectedRace.value = getDefaultRaceForClass(newClass)
+  }
+}
+
 // Handle class selection
 const handleClassSelect = (wowClass: WoWClass) => {
   // For character slots (first slot), don't allow changing the class
@@ -385,11 +488,12 @@ const handleClassSelect = (wowClass: WoWClass) => {
   }
 
   const classRoles = CLASS_ROLE_RESTRICTIONS[wowClass] || []
-  
+
   // Check if this class was disabled (doesn't support current role)
   const wasDisabled = !classRoles.includes(selectedRole.value)
-  
+
   selectedClass.value = wowClass
+  selectedRace.value = getDefaultRaceForClass(wowClass)
 
   // If the class was disabled (grayed out), always switch to the class's default role
   // Otherwise, only switch if the current role is not available
@@ -453,17 +557,35 @@ const availableDungeonTiers = computed(() => {
 // Methods
 
 const getRoleDisplayName = (role: Role) => {
+  const currentClassRoles = props.isFirstSlot && props.character
+    ? CLASS_ROLE_RESTRICTIONS[props.character.class] || []
+    : CLASS_ROLE_RESTRICTIONS[selectedClass.value] || []
+
+  const dpsRoles: Role[] = ['mdps', 'rdps', 'dps', 'frost', 'fire', 'arcane', 'magic', 'might']
+  const classDpsRoles = currentClassRoles.filter(r => dpsRoles.includes(r))
+  const hasOnlyOneDpsType = classDpsRoles.length === 1
+
   switch (role) {
     case 'tank':
       return 'Tank'
     case 'healer':
       return 'Healer'
     case 'mdps':
-      return 'Melee DPS'
+      return hasOnlyOneDpsType ? 'DPS' : 'Melee DPS'
     case 'rdps':
-      return 'Ranged DPS'
+      return hasOnlyOneDpsType ? 'DPS' : 'Ranged DPS'
     case 'dps':
       return 'DPS'
+    case 'frost':
+      return hasOnlyOneDpsType ? 'DPS' : 'Frost'
+    case 'fire':
+      return hasOnlyOneDpsType ? 'DPS' : 'Fire'
+    case 'arcane':
+      return hasOnlyOneDpsType ? 'DPS' : 'Arcane'
+    case 'magic':
+      return hasOnlyOneDpsType ? 'DPS' : 'Magic'
+    case 'might':
+      return hasOnlyOneDpsType ? 'DPS' : 'Might'
     default:
       return role
   }
@@ -606,11 +728,11 @@ watch(
   () => {
     if (props.isOpen) {
       // Reset modal state when opening
-      selectedRole.value = props.currentSlot?.role || getDefaultRole()
-      selectedClass.value =
-        props.currentSlot?.class || (props.isFirstSlot && props.character ? props.character.class : 'warrior')
+      const newClass = props.currentSlot?.class || (props.isFirstSlot && props.character ? props.character.class : 'warrior')
+      selectedRole.value = props.currentSlot?.role || getDefaultRole(newClass)
+      selectedClass.value = newClass
       selectedTierType.value = props.currentSlot?.tierType || getDefaultTierType()
-      selectedRace.value = props.currentSlot?.race
+      selectedRace.value = getInitialRace(newClass)
       selectedLicenseType.value = {
         type: props.currentSlot?.tierType || 'R',
         tier: props.currentSlot?.tier || getHighestAvailableTier(),

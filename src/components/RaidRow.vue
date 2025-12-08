@@ -36,6 +36,7 @@
         :slot="slot"
         :slot-index="slotIndex"
         :is-first-slot="slotIndex === 0"
+        :is-disabled="getSlotDisabled(slotIndex)"
         :character="row.character"
         @click="$emit('slotClick', slotIndex)"
       />
@@ -47,7 +48,6 @@
 import type { CharacterRow } from '@/types'
 import RaidSlot from './RaidSlot.vue'
 
-// Props
 interface Props {
   row: CharacterRow
   rowIndex: number
@@ -57,14 +57,30 @@ interface Props {
 
 const props = defineProps<Props>()
 
-// Emits
-const emit = defineEmits<{
+defineEmits<{
   slotClick: [slotIndex: number]
   setCurrentPlayer: [playerId: string]
 }>()
 
-// Methods
 const capitalizeFirst = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}
+
+const getSlotDisabled = (slotIndex: number): boolean => {
+  if (!props.isCurrentPlayer) return false
+
+  const liteSlot = props.row.slots[0]
+  const companionSlots = props.row.slots.slice(1)
+  const filledCompanions = companionSlots.filter((s) => s !== null).length
+
+  if (slotIndex === 0) {
+    return liteSlot === null && filledCompanions === 4
+  }
+
+  if (slotIndex === 4) {
+    return liteSlot !== null
+  }
+
+  return false
 }
 </script>

@@ -13,14 +13,14 @@ export const CLASS_RACE_RESTRICTIONS: Record<WoWClass, Race[]> = {
 }
 
 export const CLASS_ROLE_RESTRICTIONS: Record<WoWClass, Role[]> = {
-  warrior: ['tank', 'dps'],
-  paladin: ['tank', 'healer', 'dps'],
-  hunter: ['dps'],
-  rogue: ['dps'],
-  priest: ['healer', 'dps'],
+  warrior: ['tank', 'mdps'],
+  paladin: ['tank', 'healer', 'magic', 'might'],
+  hunter: ['rdps'],
+  rogue: ['mdps'],
+  priest: ['healer', 'rdps'],
   shaman: ['mdps', 'rdps', 'healer', 'tank'],
-  mage: ['dps'],
-  warlock: ['dps'],
+  mage: ['frost', 'fire', 'arcane'],
+  warlock: ['rdps'],
   druid: ['mdps', 'rdps', 'healer', 'tank'],
 }
 
@@ -41,15 +41,15 @@ export const HORDE_RACES: HordeRace[] = ['orc', 'undead', 'tauren', 'troll']
 
 // Most common/preferred roles for each class in WoW Classic raiding
 export const CLASS_DEFAULT_ROLES: Record<WoWClass, Role> = {
-  warrior: 'mdps', // Fury is the main raid spec
-  paladin: 'healer', // Holy is the primary raid role
-  hunter: 'rdps', // Only ranged DPS available
-  rogue: 'mdps', // Only melee DPS available
-  priest: 'healer', // Primary raid role is healing
-  shaman: 'healer', // Restoration is most common in raids
-  mage: 'rdps', // Only ranged DPS available
-  warlock: 'rdps', // Only ranged DPS available
-  druid: 'healer', // Restoration is most valued in raids
+  warrior: 'mdps',
+  paladin: 'healer',
+  hunter: 'rdps',
+  rogue: 'mdps',
+  priest: 'healer',
+  shaman: 'healer',
+  mage: 'frost',
+  warlock: 'rdps',
+  druid: 'healer',
 }
 
 export const getFactionFromRace = (race: Race): Faction =>

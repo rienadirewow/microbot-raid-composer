@@ -117,10 +117,15 @@ const getTierColor = (tier: TierLevel, isUnlocked: boolean) => {
 const formatRoleName = (role: Role) => {
   const roleNames: Record<Role, string> = {
     tank: 'Tank',
-    healer: 'Healer', 
+    healer: 'Healer',
     mdps: 'Melee DPS',
     rdps: 'Ranged DPS',
-    dps: 'DPS'
+    dps: 'DPS',
+    frost: 'Frost',
+    fire: 'Fire',
+    arcane: 'Arcane',
+    magic: 'Magic',
+    might: 'Might',
   }
   return roleNames[role] || role
 }
@@ -129,7 +134,7 @@ const getRoleBadgeClass = (role: Role | undefined) => {
   if (!role) {
     return 'bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200'
   }
-  
+
   const baseClasses = 'hover:opacity-80'
   switch (role) {
     case 'tank':
@@ -139,7 +144,16 @@ const getRoleBadgeClass = (role: Role | undefined) => {
     case 'mdps':
     case 'rdps':
     case 'dps':
+    case 'might':
       return `bg-red-100 text-red-800 border-red-200 ${baseClasses}`
+    case 'frost':
+      return `bg-cyan-100 text-cyan-800 border-cyan-200 ${baseClasses}`
+    case 'fire':
+      return `bg-orange-100 text-orange-800 border-orange-200 ${baseClasses}`
+    case 'arcane':
+      return `bg-purple-100 text-purple-800 border-purple-200 ${baseClasses}`
+    case 'magic':
+      return `bg-pink-100 text-pink-800 border-pink-200 ${baseClasses}`
     default:
       return `bg-gray-100 text-gray-800 border-gray-200 ${baseClasses}`
   }

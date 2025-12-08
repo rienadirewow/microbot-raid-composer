@@ -19,7 +19,6 @@ export const useSupabase = () => {
     })
   }
 
-  // Get initial auth state
   const getInitialAuthState = async () => {
     const {
       data: { session },

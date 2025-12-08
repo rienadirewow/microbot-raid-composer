@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-6xl mx-auto p-4">
     <!-- Header -->
-    <PageHeader title="Raids" description="Create and manage your WoW Classic raid compositions">
+    <PageHeader title="Raids" description="Create and manage your Microbot-WoW raid compositions">
       <template #action>
         <Button @click="createNewRaid">New Raid</Button>
       </template>
@@ -80,41 +80,69 @@
         <div class="flex items-center space-x-4">
           <ProgressBar :value="totalFilledSlots" :max="40" />
           <div class="text-sm text-slate-600">
-            <span class="font-medium" :class="{ 'text-green-600': totalFilledSlots >= 40 }">{{ totalFilledSlots }}/40</span>
-            <span v-if="totalFilledSlots >= 40" class="text-green-600 ml-2 font-semibold">Raid Full!</span>
-            <span v-else-if="currentPlayer" class="text-amber-600 ml-2">(includes current player)</span>
+            <span class="font-medium" :class="{ 'text-green-600': totalFilledSlots >= 40 }"
+              >{{ totalFilledSlots }}/40</span
+            >
+            <span v-if="totalFilledSlots >= 40" class="text-green-600 ml-2 font-semibold"
+              >Raid Full!</span
+            >
+            <span v-else-if="currentPlayer" class="text-amber-600 ml-2"
+              >(includes current player)</span
+            >
           </div>
         </div>
         <div class="flex items-center space-x-4">
           <!-- Tank Counter -->
-          <div class="flex items-center px-2 py-1.5 rounded-lg border transition-colors" 
-               :class="getRoleCounterClass('tank')">
+          <div
+            class="flex items-center px-2 py-1.5 rounded-lg border transition-colors"
+            :class="getRoleCounterClass('tank')"
+          >
             <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              <path
+                fill-rule="evenodd"
+                d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clip-rule="evenodd"
+              />
             </svg>
             <div class="text-sm font-semibold">
               <div class="text-gray-900">Tanks</div>
-              <div class="text-xs text-gray-600">{{ roleCounts.tank }}/{{ suggestedRoles.tank }}</div>
+              <div class="text-xs text-gray-600">
+                {{ roleCounts.tank }}/{{ suggestedRoles.tank }}
+              </div>
             </div>
           </div>
-          
+
           <!-- Healer Counter -->
-          <div class="flex items-center px-2 py-1.5 rounded-lg border transition-colors" 
-               :class="getRoleCounterClass('healer')">
+          <div
+            class="flex items-center px-2 py-1.5 rounded-lg border transition-colors"
+            :class="getRoleCounterClass('healer')"
+          >
             <svg class="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+              <path
+                fill-rule="evenodd"
+                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                clip-rule="evenodd"
+              />
             </svg>
             <div class="text-sm font-semibold">
               <div class="text-gray-900">Healers</div>
-              <div class="text-xs text-gray-600">{{ roleCounts.healer }}/{{ suggestedRoles.healer }}</div>
+              <div class="text-xs text-gray-600">
+                {{ roleCounts.healer }}/{{ suggestedRoles.healer }}
+              </div>
             </div>
           </div>
-          
+
           <!-- DPS Counter -->
-          <div class="flex items-center px-2 py-1.5 rounded-lg border transition-colors" 
-               :class="getRoleCounterClass('dps')">
+          <div
+            class="flex items-center px-2 py-1.5 rounded-lg border transition-colors"
+            :class="getRoleCounterClass('dps')"
+          >
             <svg class="w-5 h-5 mr-2 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+              <path
+                fill-rule="evenodd"
+                d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z"
+                clip-rule="evenodd"
+              />
             </svg>
             <div class="text-sm font-semibold">
               <div class="text-gray-900">DPS</div>
@@ -156,23 +184,10 @@
             <span class="text-sm text-gray-500">
               T{{ currentPlayer.unlockedTiers.r }}R, T{{ currentPlayer.unlockedTiers.d }}D
             </span>
-            <!-- Current Player Role Selector -->
-            <select
-              v-model="currentPlayerRole"
-              class="ml-3 px-2 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option
-                v-for="role in getAvailableRolesForClass(currentPlayer.class)"
-                :key="role"
-                :value="role"
-              >
-                {{ getRoleDisplayName(role) }}
-              </option>
-            </select>
           </div>
           <div v-else class="text-gray-500 italic">No current player selected</div>
         </div>
-        
+
         <!-- Export Button -->
         <Button variant="warning" size="sm" @click="exportRaid">Export Commands</Button>
       </div>
@@ -193,7 +208,6 @@
         </div>
       </div>
 
-
       <!-- Raid Grid -->
       <RaidGrid
         :composition="composition"
@@ -206,7 +220,7 @@
       <!-- Player Selection Modal -->
       <div
         v-if="showPlayerSelector"
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        class="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50"
         @click="showPlayerSelector = false"
       >
         <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4" @click.stop>
@@ -267,6 +281,106 @@
         @assign-slot="handleAssignSlot"
         @clear-slot="handleClearSlot"
       />
+
+      <!-- Slot Remove Modal -->
+      <div
+        v-if="slotRemoveModal.isOpen"
+        class="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50"
+        @click="cancelSlotRemove"
+      >
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4" @click.stop>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Remove a Bot</h3>
+          <p class="text-gray-600 mb-4">
+            Current player can only hire 4 bots. Which one would you like to remove?
+          </p>
+          <div class="grid grid-cols-2 gap-2 mb-4">
+            <button
+              v-for="{ index, slot } in slotRemoveModal.filledSlots"
+              :key="index"
+              @click="removeSlotAndSwitchPlayer(index)"
+              class="text-left p-3 rounded-lg border-2 border-gray-200 hover:border-red-300 hover:bg-red-50 transition-colors"
+              :class="{ 'col-span-2': index === 0 }"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="font-medium" :style="{ color: getClassColor(slot.class) }">
+                    {{
+                      index === 0
+                        ? capitalizeFirst(slotRemoveModalCharacter?.name || '')
+                        : getClassDisplayName(slot.class)
+                    }}
+                  </span>
+                  <span class="text-gray-600 ml-2">{{ getSimpleRoleDisplayName(slot.role) }}</span>
+                  <span class="text-gray-500 ml-2 text-sm"
+                    >T{{ slot.tier }}{{ slot.tierType }}</span
+                  >
+                </div>
+                <svg
+                  class="w-5 h-5 text-red-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+              </div>
+            </button>
+          </div>
+          <div class="flex justify-end">
+            <button
+              @click="cancelSlotRemove"
+              class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Commands Modal -->
+      <Modal v-if="showExportModal" title="Export Lua Script" @close="showExportModal = false">
+        <div class="space-y-4">
+          <div class="relative">
+            <div class="bg-gray-900 rounded-lg p-4 overflow-auto max-h-96">
+              <pre class="text-green-400 text-sm font-mono whitespace-pre">{{ exportCommands }}</pre>
+            </div>
+            <button
+              @click="copyExportCommands"
+              class="absolute top-2 right-2 flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors"
+              :class="
+                justCopied
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-700 text-gray-200 hover:bg-gray-600'
+              "
+            >
+              <svg v-if="justCopied" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fill-rule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
+              </svg>
+              {{ justCopied ? 'Copied!' : 'Copy' }}
+            </button>
+          </div>
+          <p class="text-sm text-gray-600">
+            Paste this Lua script in-game to hire your raid. Hiring order: current player's bots first (up to 4), then all lites, then remaining companions.
+          </p>
+        </div>
+      </Modal>
     </div>
 
     <!-- No Current Raid -->
@@ -281,7 +395,7 @@
     </EmptyState>
 
     <!-- Saved Raids -->
-    <div v-if="raidsStore.raids.length > 0" class="mb-8">
+    <div v-if="raidsStore.raids.length > 0" class="mb-8 mt-8">
       <h2 class="text-xl font-semibold text-gray-900 mb-4">Saved Raids</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <SavedRaidCard
@@ -335,6 +449,7 @@ import ProgressBar from '../components/ui/ProgressBar.vue'
 import SavedRaidCard from '../components/SavedRaidCard.vue'
 import RaidGrid from '../components/RaidGrid.vue'
 import SlotAssignmentModal from '../components/SlotAssignmentModal.vue'
+import Modal from '../components/ui/Modal.vue'
 
 // Stores
 const charactersStore = useCharactersStore()
@@ -342,11 +457,13 @@ const raidsStore = useRaidsStore()
 
 // State
 const currentPlayerId = ref<string>('')
-const currentPlayerRole = ref<Role>('dps') // Default current player role to DPS
 const showPlayerSelector = ref(false)
 const isEditing = ref(false)
 const editingName = ref('')
 const nameInput = ref<HTMLInputElement>()
+const showExportModal = ref(false)
+const exportCommands = ref('')
+const justCopied = ref(false)
 
 // Raid composition state
 const composition = ref<CharacterRow[]>([])
@@ -358,6 +475,17 @@ const assignmentModal = ref<{
   isOpen: false,
   rowIndex: 0,
   slotIndex: 0,
+})
+
+// Confirmation modal for clearing a slot when changing current player (can only have 4 bots)
+const slotRemoveModal = ref<{
+  isOpen: boolean
+  newPlayerId: string
+  filledSlots: { index: number; slot: PlayerSlot }[]
+}>({
+  isOpen: false,
+  newPlayerId: '',
+  filledSlots: [],
 })
 
 // Lifecycle
@@ -372,14 +500,6 @@ onMounted(async () => {
 watch(currentPlayerId, async (newPlayerId) => {
   if (raidsStore.currentRaid) {
     raidsStore.currentRaid.currentPlayerId = newPlayerId || undefined
-    await raidsStore.saveCurrentRaid()
-  }
-})
-
-// Watch current player role changes and auto-save
-watch(currentPlayerRole, async (newRole) => {
-  if (raidsStore.currentRaid) {
-    raidsStore.currentRaid.currentPlayerRole = newRole
     await raidsStore.saveCurrentRaid()
   }
 })
@@ -399,14 +519,20 @@ const currentCharacter = computed(() => {
   return row?.character || charactersStore.characters[0]
 })
 
+const slotRemoveModalCharacter = computed(() => {
+  const row = composition.value.find((r) => r.character.id === slotRemoveModal.value.newPlayerId)
+  return row?.character || null
+})
+
 const roleCounts = computed(() => {
   const counts = { tank: 0, healer: 0, dps: 0 }
 
-  // Count current player with their selected role
+  // Count current player with their character's default role
   if (currentPlayer.value) {
-    if (currentPlayerRole.value === 'tank') counts.tank++
-    else if (currentPlayerRole.value === 'healer') counts.healer++
-    else counts.dps++ // dps, mdps, rdps all count as dps
+    const role = currentPlayer.value.defaultRole || getDefaultRole(currentPlayer.value.class)
+    if (role === 'tank') counts.tank++
+    else if (role === 'healer') counts.healer++
+    else counts.dps++
   }
 
   // Count all companions and lites
@@ -415,7 +541,7 @@ const roleCounts = computed(() => {
       if (slot) {
         if (slot.role === 'tank') counts.tank++
         else if (slot.role === 'healer') counts.healer++
-        else if (['dps', 'mdps', 'rdps'].includes(slot.role)) counts.dps++
+        else counts.dps++
       }
     })
   })
@@ -425,13 +551,13 @@ const roleCounts = computed(() => {
 
 const suggestedRoles = computed(() => {
   const totalSlots = totalFilledSlots.value
-  
+
   // Standard raid composition ratios based on total filled slots
   // Approximately: 10% tanks, 25% healers, 65% dps
   const tanks = Math.max(1, Math.ceil(totalSlots * 0.1)) // At least 1 tank, ~10% of raid
-  const healers = Math.max(1, Math.ceil(totalSlots * 0.25)) // At least 1 healer, ~25% of raid  
+  const healers = Math.max(1, Math.ceil(totalSlots * 0.25)) // At least 1 healer, ~25% of raid
   const dps = Math.max(0, totalSlots - tanks - healers) // Remaining slots for dps
-  
+
   return {
     tank: tanks,
     healer: healers,
@@ -441,43 +567,57 @@ const suggestedRoles = computed(() => {
 
 const totalFilledSlots = computed(() => {
   let count = 0
-  
+
   // Count current player
   if (currentPlayer.value) {
     count++
   }
-  
+
   // Count assigned slots
   composition.value.forEach((row) => {
     row.slots.forEach((slot) => {
       if (slot) count++
     })
   })
-  
+
   return count
 })
 
 // Methods
-const createNewRaid = () => {
+const createNewRaid = async () => {
   raidsStore.createNewRaid('mixed')
   // Initialize character groups for the new raid immediately
   initializeCharacterGroupsForNewRaid()
+  // Save the initial composition to storage
+  await updateRaidComposition(composition.value)
 }
 
 const exportRaid = () => {
   const commands = raidsStore.generateExportString()
   if (commands) {
+    exportCommands.value = commands
     navigator.clipboard.writeText(commands)
-    alert('Commands copied to clipboard!')
+    justCopied.value = true
+    setTimeout(() => {
+      justCopied.value = false
+    }, 2000)
+    showExportModal.value = true
   } else {
     alert('No companions assigned to export.')
   }
 }
 
+const copyExportCommands = () => {
+  navigator.clipboard.writeText(exportCommands.value)
+  justCopied.value = true
+  setTimeout(() => {
+    justCopied.value = false
+  }, 2000)
+}
 
 const cloneCurrentRaid = async () => {
   if (!raidsStore.currentRaid) return
-  
+
   // Create a copy with new ID and name
   const clonedRaid = {
     ...raidsStore.currentRaid,
@@ -486,7 +626,7 @@ const cloneCurrentRaid = async () => {
     createdAt: new Date(),
     updatedAt: new Date(),
   }
-  
+
   // Add to raids array and set as current
   raidsStore.raids.push(clonedRaid)
   raidsStore.currentRaid = clonedRaid
@@ -507,29 +647,35 @@ const loadRaid = (raidId: string) => {
 }
 
 const updateRaidComposition = async (newComposition: CharacterRow[]) => {
-  composition.value = newComposition
+  composition.value = [...newComposition]
   if (!raidsStore.currentRaid) return
 
   // Convert to new character slots structure
   const characterSlots: CharacterSlotGroup[] = newComposition.map((row) => {
-    const liteSlot = row.slots[0] ? {
-      class: row.slots[0].class,
-      role: row.slots[0].role,
-      tier: row.slots[0].tier,
-      tierType: row.slots[0].tierType,
-      isLite: true,
-      characterName: row.character.name,
-    } : null
+    const liteSlot = row.slots[0]
+      ? {
+          class: row.slots[0].class,
+          role: row.slots[0].role,
+          tier: row.slots[0].tier,
+          tierType: row.slots[0].tierType,
+          isLite: true,
+          characterName: row.character.name,
+        }
+      : null
 
-    const companionSlots = row.slots.slice(1, 5).map(slot => slot ? {
-      class: slot.class,
-      role: slot.role,
-      tier: slot.tier,
-      tierType: slot.tierType,
-      race: slot.race,
-      isLite: false,
-      characterName: undefined,
-    } : null)
+    const companionSlots = row.slots.slice(1, 5).map((slot) =>
+      slot
+        ? {
+            class: slot.class,
+            role: slot.role,
+            tier: slot.tier,
+            tierType: slot.tierType,
+            race: slot.race,
+            isLite: false,
+            characterName: undefined,
+          }
+        : null,
+    )
 
     return {
       characterId: row.character.id,
@@ -541,7 +687,6 @@ const updateRaidComposition = async (newComposition: CharacterRow[]) => {
   // Update new structure
   raidsStore.currentRaid.characterSlots = characterSlots
   raidsStore.currentRaid.currentPlayerId = currentPlayerId.value || undefined
-  raidsStore.currentRaid.currentPlayerRole = currentPlayerRole.value
   raidsStore.currentRaid.updatedAt = new Date()
 
   // Also update legacy structure for backward compatibility
@@ -556,9 +701,10 @@ const updateRaidComposition = async (newComposition: CharacterRow[]) => {
       if (playerSlot) {
         const assignment: CompanionAssignment = {
           id: `${characterRow.character.id}-${slotInRow}`,
-          name: playerSlot.isCharacter && slotInRow === 0
-            ? `${characterRow.character.name}-lite`
-            : `${characterRow.character.name}'s Companion`,
+          name:
+            playerSlot.isCharacter && slotInRow === 0
+              ? `${characterRow.character.name}-lite`
+              : `${characterRow.character.name}'s Companion`,
           class: playerSlot.class,
           role: playerSlot.role,
           tier: playerSlot.tier,
@@ -586,7 +732,66 @@ const updateRaidName = async (newName: string) => {
 }
 
 const handleUpdateCurrentPlayer = (playerId: string) => {
+  const oldPlayerId = currentPlayerId.value
+
+  if (playerId !== oldPlayerId) {
+    const newPlayerRow = composition.value.find((row) => row.character.id === playerId)
+    if (newPlayerRow) {
+      const liteSlot = newPlayerRow.slots[0]
+      const companionSlots = newPlayerRow.slots.slice(1)
+      const filledCompanions = companionSlots.filter((s) => s !== null)
+
+      if (liteSlot && filledCompanions.length === 4) {
+        const filledSlots = newPlayerRow.slots
+          .map((slot, index) => (slot ? { index, slot } : null))
+          .filter((item): item is { index: number; slot: PlayerSlot } => item !== null)
+
+        slotRemoveModal.value = {
+          isOpen: true,
+          newPlayerId: playerId,
+          filledSlots,
+        }
+        return
+      }
+
+      if (liteSlot) {
+        const reorderedCompanions: (PlayerSlot | null)[] = [...filledCompanions]
+        while (reorderedCompanions.length < 4) {
+          reorderedCompanions.push(null)
+        }
+        newPlayerRow.slots = [liteSlot, ...reorderedCompanions]
+        updateRaidComposition(composition.value)
+      }
+    }
+  }
+
   currentPlayerId.value = playerId
+}
+
+const removeSlotAndSwitchPlayer = (slotIndex: number) => {
+  const newPlayerRow = composition.value.find(
+    (row) => row.character.id === slotRemoveModal.value.newPlayerId,
+  )
+  if (newPlayerRow) {
+    if (slotIndex === 0) {
+      newPlayerRow.slots[0] = null
+    } else {
+      const liteSlot = newPlayerRow.slots[0]
+      const companionSlots = newPlayerRow.slots.slice(1).filter((_, i) => i + 1 !== slotIndex)
+      while (companionSlots.length < 4) {
+        companionSlots.push(null)
+      }
+      newPlayerRow.slots = [liteSlot, ...companionSlots]
+    }
+    updateRaidComposition(composition.value)
+  }
+
+  currentPlayerId.value = slotRemoveModal.value.newPlayerId
+  slotRemoveModal.value.isOpen = false
+}
+
+const cancelSlotRemove = () => {
+  slotRemoveModal.value.isOpen = false
 }
 
 const initializeCharacterGroupsForNewRaid = () => {
@@ -597,10 +802,13 @@ const initializeCharacterGroupsForNewRaid = () => {
   const maxRaidSize = 40
   const currentPlayerCount = currentPlayerId.value ? 1 : 0
   const maxAvailableSlots = maxRaidSize - currentPlayerCount
-  
+
   // Since each character starts with 1 lite by default, we can include at most maxAvailableSlots characters
   // This ensures we don't exceed the raid size limit even with just lite characters
-  const charactersToInclude = charactersStore.characters.slice(0, Math.min(maxAvailableSlots, charactersStore.characters.length))
+  const charactersToInclude = charactersStore.characters.slice(
+    0,
+    Math.min(maxAvailableSlots, charactersStore.characters.length),
+  )
 
   // Initialize with empty slots and include lite characters by default
   composition.value = charactersToInclude.map((character) => {
@@ -626,7 +834,9 @@ const initializeCharacterGroupsForNewRaid = () => {
     }
   })
 
-  console.log(`Final composition for new raid: ${composition.value.length} character groups (${composition.value.length + currentPlayerCount} total slots used)`)
+  console.log(
+    `Final composition for new raid: ${composition.value.length} character groups (${composition.value.length + currentPlayerCount} total slots used)`,
+  )
 }
 
 const initializeCharacterGroups = () => {
@@ -635,31 +845,29 @@ const initializeCharacterGroups = () => {
   console.log('Characters:', charactersStore.characters)
 
   if (raidsStore.currentRaid) {
-    // Load current player ID and role
     currentPlayerId.value = raidsStore.currentRaid.currentPlayerId || ''
-    currentPlayerRole.value = raidsStore.currentRaid.currentPlayerRole || 'dps'
 
     // Use new characterSlots structure if available
     if (raidsStore.currentRaid.characterSlots && raidsStore.currentRaid.characterSlots.length > 0) {
       composition.value = charactersStore.characters.map((character) => {
         const slots: (PlayerSlot | null)[] = Array(5).fill(null)
-        
+
         // Find this character's slot group in the raid
         const characterSlotGroup = raidsStore.currentRaid!.characterSlots.find(
-          (group) => group.characterId === character.id
+          (group) => group.characterId === character.id,
         )
 
         if (characterSlotGroup) {
-          // Load lite slot (slot 0)
+          // Load lite slot (slot 0) - always use character's current defaultRole
           if (characterSlotGroup.liteSlot) {
             slots[0] = {
-              class: characterSlotGroup.liteSlot.class,
-              role: characterSlotGroup.liteSlot.role,
+              class: character.class,
+              role: character.defaultRole || getDefaultRole(character.class),
               tier: characterSlotGroup.liteSlot.tier,
               tierType: characterSlotGroup.liteSlot.tierType,
               isCharacter: true,
               characterName: character.name,
-              isControlMember: false, // Lite is not control member
+              isControlMember: false,
             }
           }
 
@@ -695,8 +903,11 @@ const initializeCharacterGroups = () => {
 
             if (raidSlot?.assignment) {
               slots[i] = {
-                class: raidSlot.assignment.class,
-                role: raidSlot.assignment.role,
+                class: i === 0 ? character.class : raidSlot.assignment.class,
+                role:
+                  i === 0
+                    ? character.defaultRole || getDefaultRole(character.class)
+                    : raidSlot.assignment.role,
                 tier: raidSlot.assignment.tier,
                 tierType: raidSlot.assignment.tier === character.unlockedTiers.r ? 'R' : 'D',
                 isCharacter: i === 0,
@@ -726,9 +937,35 @@ const canAssignRole = (wowClass: string, role: string): boolean => {
   return true // All classes can be DPS
 }
 
-const handleSlotClick = (rowIndex: number, slotIndex: number) => {
-  const slot = composition.value[rowIndex]?.slots[slotIndex]
-  
+const handleSlotClick = (characterId: string, slotIndex: number) => {
+  const rowIndex = composition.value.findIndex((row) => row.character.id === characterId)
+  if (rowIndex === -1) return
+
+  const row = composition.value[rowIndex]
+  const slot = row?.slots[slotIndex]
+  const isFirstSlot = slotIndex === 0
+
+  // For lite slots (first slot), toggle activation directly
+  if (isFirstSlot) {
+    if (slot) {
+      row.slots[slotIndex] = null
+    } else {
+      row.slots[slotIndex] = {
+        class: row.character.class,
+        role: row.character.defaultRole || getDefaultRole(row.character.class),
+        tier: Math.max(row.character.unlockedTiers.r, row.character.unlockedTiers.d) as TierLevel,
+        tierType: row.character.unlockedTiers.r >= row.character.unlockedTiers.d ? 'R' : 'D',
+        race: row.character.race,
+        isCharacter: true,
+        characterName: row.character.name,
+        isControlMember: false,
+      }
+    }
+    updateRaidComposition(composition.value)
+    return
+  }
+
+  // For companion slots, open the modal
   // If slot is already filled, allow editing
   if (slot) {
     assignmentModal.value = {
@@ -738,16 +975,16 @@ const handleSlotClick = (rowIndex: number, slotIndex: number) => {
     }
     return
   }
-  
+
   // Check if raid is full (40 including current player, 39 without)
   const maxRaidSize = 40
   const currentTotal = totalFilledSlots.value
-  
+
   if (currentTotal >= maxRaidSize) {
     alert(`Raid is full! Maximum size is ${maxRaidSize} (including current player).`)
     return
   }
-  
+
   assignmentModal.value = {
     isOpen: true,
     rowIndex,
@@ -759,7 +996,13 @@ const closeAssignmentModal = () => {
   assignmentModal.value.isOpen = false
 }
 
-const handleAssignSlot = (wowClass: WoWClass, role: Role, tierType: TierType, tier: TierLevel, race?: Race) => {
+const handleAssignSlot = (
+  wowClass: WoWClass,
+  role: Role,
+  tierType: TierType,
+  tier: TierLevel,
+  race?: Race,
+) => {
   const row = composition.value[assignmentModal.value.rowIndex]
   if (!row) return
 
@@ -770,7 +1013,7 @@ const handleAssignSlot = (wowClass: WoWClass, role: Role, tierType: TierType, ti
     role,
     tier,
     tierType,
-    race: race || (isFirstSlot ? row.character.race : undefined), // Use specified race or character race for lites
+    race: race || (isFirstSlot ? row.character.race : undefined),
     isCharacter: isFirstSlot,
     characterName: isFirstSlot ? row.character.name : undefined,
     isControlMember: row.character.name === 'Current Player',
@@ -814,8 +1057,8 @@ const cancelEditing = () => {
 }
 
 const selectCurrentPlayer = (character: PlayerCharacter) => {
-  currentPlayerId.value = character.id
   showPlayerSelector.value = false
+  handleUpdateCurrentPlayer(character.id)
 }
 
 const capitalizeFirst = (str: string) => {
@@ -854,23 +1097,47 @@ const getClassDisplayName = (wowClass: string) => {
 
 const getRoleDisplayName = (role: Role) => {
   switch (role) {
-    case 'tank': return 'Tank'
-    case 'healer': return 'Healer'  
-    case 'mdps': return 'Melee DPS'
-    case 'rdps': return 'Ranged DPS'
-    case 'dps': return 'DPS'
-    default: return role
+    case 'tank':
+      return 'Tank'
+    case 'healer':
+      return 'Healer'
+    case 'mdps':
+      return 'Melee DPS'
+    case 'rdps':
+      return 'Ranged DPS'
+    case 'dps':
+      return 'DPS'
+    default:
+      return role
   }
 }
 
-const getAvailableRolesForClass = (wowClass: WoWClass) => {
-  return CLASS_ROLE_RESTRICTIONS[wowClass] || ['dps']
+const getSimpleRoleDisplayName = (role: Role) => {
+  switch (role) {
+    case 'tank':
+      return 'Tank'
+    case 'healer':
+      return 'Healer'
+    case 'mdps':
+      return 'Melee'
+    case 'rdps':
+      return 'Ranged'
+    case 'dps':
+    case 'frost':
+    case 'fire':
+    case 'arcane':
+    case 'magic':
+    case 'might':
+      return 'DPS'
+    default:
+      return role
+  }
 }
 
 const getRoleCounterClass = (role: 'tank' | 'healer' | 'dps') => {
   const current = roleCounts.value[role]
   const suggested = suggestedRoles.value[role]
-  
+
   if (current === 0) {
     return 'bg-gray-50 border-gray-200 text-gray-400'
   } else if (current < suggested) {

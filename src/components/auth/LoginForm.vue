@@ -60,6 +60,7 @@
       {{ loading ? 'Signing in...' : 'Sign in' }}
     </Button>
 
+    <!-- Signup disabled for now
     <div class="text-center">
       <span class="text-sm text-gray-600">Don't have an account? </span>
       <button
@@ -70,6 +71,7 @@
         Sign up
       </button>
     </div>
+    -->
   </form>
 </template>
 

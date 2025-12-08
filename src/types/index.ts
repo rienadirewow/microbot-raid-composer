@@ -9,7 +9,7 @@ export type WoWClass =
   | 'mage'
   | 'warlock'
   | 'druid'
-export type Role = 'tank' | 'healer' | 'mdps' | 'rdps' | 'dps'
+export type Role = 'tank' | 'healer' | 'mdps' | 'rdps' | 'dps' | 'frost' | 'fire' | 'arcane' | 'magic' | 'might'
 export type TierLevel = 0 | 1 | 2 | 3 | 4 | 5
 export type TierType = 'R' | 'D'
 
@@ -38,7 +38,7 @@ export interface PlayerSlot {
   role: Role
   tier: TierLevel
   tierType: TierType
-  race?: Race // Optional race selection for companions
+  race?: Race
   isCharacter?: boolean
   characterName?: string
   isControlMember?: boolean

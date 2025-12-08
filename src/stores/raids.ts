@@ -1,8 +1,19 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
-import type { RaidComposition, RaidSlot, CompanionAssignment, Faction, CharacterSlotGroup } from '@/types'
+import type {
+  RaidComposition,
+  RaidSlot,
+  CompanionAssignment,
+  Faction,
+  CharacterSlotGroup,
+  Role,
+  WoWClass,
+  TierLevel,
+  TierType,
+} from '@/types'
 import { useStorage } from '@/composables/useStorage'
 import { TOTAL_RAID_SLOTS, RAID_GROUPS, SLOTS_PER_GROUP } from '@/data/wow-data'
+import { useCharactersStore } from './characters'
 
 export const useRaidsStore = defineStore('raids', () => {
   const raids = ref<RaidComposition[]>([])
@@ -147,20 +158,162 @@ export const useRaidsStore = defineStore('raids', () => {
     return true
   }
 
-  // Generate export string for the current raid
+  const formatTier = (tier: TierLevel, tierType: TierType): string => {
+    if (tier === 0) return 't0'
+    return `t${tier}${tierType.toLowerCase()}`
+  }
+
+  const formatRoleAndSpec = (role: Role, wowClass: WoWClass): { role: string; spec: string } => {
+    if (wowClass === 'paladin' && (role === 'magic' || role === 'might')) {
+      return { role: 'dps', spec: role }
+    }
+    switch (role) {
+      case 'mdps':
+        return { role: 'meleedps', spec: 'default' }
+      case 'rdps':
+        return { role: 'rangedps', spec: 'default' }
+      default:
+        return { role, spec: 'default' }
+    }
+  }
+
+  const formatLiteRole = (role: Role, wowClass: WoWClass): string => {
+    if (wowClass === 'paladin' && (role === 'magic' || role === 'might')) {
+      return 'dps'
+    }
+    switch (role) {
+      case 'mdps':
+      case 'rdps':
+        return 'dps'
+      default:
+        return role
+    }
+  }
+
   const generateExportString = () => {
     if (!currentRaid.value) return ''
 
-    const commands: string[] = []
+    const charactersStore = useCharactersStore()
+    const characterSlots = currentRaid.value.characterSlots
+    const currentPlayerId = currentRaid.value.currentPlayerId
 
-    for (const slot of currentRaid.value.slots) {
-      if (slot.assignment) {
-        const { name, tier, class: wowClass, role, race } = slot.assignment
-        commands.push(`.z addinvite ${name} ${tier} ${wowClass} ${role} default ${race}`)
+    if (!characterSlots || characterSlots.length === 0) return ''
+
+    const currentPlayerCompanions: string[] = []
+    let currentPlayerLite: string | null = null
+    const otherLites: string[] = []
+    const otherCompanions: string[] = []
+
+    for (const group of characterSlots) {
+      const character = charactersStore.getCharacterById(group.characterId)
+      if (!character) continue
+
+      const isCurrentPlayer = group.characterId === currentPlayerId
+
+      if (group.liteSlot) {
+        const liteRole = formatLiteRole(group.liteSlot.role, character.class)
+        const liteCommand = `.z addlegacy ${character.name} ${liteRole}`
+
+        if (isCurrentPlayer) {
+          currentPlayerLite = liteCommand
+        } else {
+          otherLites.push(liteCommand)
+        }
+      }
+
+      for (const slot of group.companionSlots) {
+        if (!slot) continue
+
+        const tier = formatTier(slot.tier, slot.tierType)
+        const { role, spec } = formatRoleAndSpec(slot.role, slot.class)
+        const race = slot.race || 'default'
+
+        const compCommand = `.z addinvite ${character.name} ${tier} ${slot.class} ${role} ${spec} ${race}`
+
+        if (isCurrentPlayer) {
+          currentPlayerCompanions.push(compCommand)
+        } else {
+          otherCompanions.push(compCommand)
+        }
       }
     }
 
-    return commands.join('\n')
+    // Order: current player's companions (up to 3-4), current player's lite, other lites, other companions
+    // If current player has 4 companions, hire those first, then lite goes with other lites
+    // If current player has 3 or fewer companions, hire those + lite (total 4), then other lites, then other companions
+    const allCommands: string[] = []
+
+    if (currentPlayerCompanions.length >= 4) {
+      // 4 companions first, then current player's lite with other lites
+      allCommands.push(...currentPlayerCompanions.slice(0, 4))
+      if (currentPlayerLite) {
+        allCommands.push(currentPlayerLite)
+      }
+      allCommands.push(...otherLites)
+      allCommands.push(...otherCompanions)
+      // Any extra companions from current player at the end
+      if (currentPlayerCompanions.length > 4) {
+        allCommands.push(...currentPlayerCompanions.slice(4))
+      }
+    } else {
+      // 3 or fewer companions, then lite (to make 4), then other lites, then other companions
+      allCommands.push(...currentPlayerCompanions)
+      if (currentPlayerLite) {
+        allCommands.push(currentPlayerLite)
+      }
+      allCommands.push(...otherLites)
+      allCommands.push(...otherCompanions)
+    }
+
+    // Generate Lua script
+    const commandsArray = allCommands.map((cmd) => `        "${cmd}"`).join(',\n')
+
+    // Get current player name for validation
+    const currentPlayerCharacter = currentPlayerId
+      ? charactersStore.getCharacterById(currentPlayerId)
+      : null
+    const expectedPlayerName = currentPlayerCharacter?.name?.toLowerCase() || ''
+
+    const luaScript = `local commands = {
+${commandsArray}
+}
+
+local expectedPlayer = "${expectedPlayerName}"
+local currentPlayer = string.lower(UnitName("player"))
+
+if currentPlayer ~= expectedPlayer then
+    DEFAULT_CHAT_FRAME:AddMessage("[Raid Composer] ERROR: Wrong character!", 1, 0, 0)
+    DEFAULT_CHAT_FRAME:AddMessage("Expected: " .. expectedPlayer, 1, 0, 0)
+    DEFAULT_CHAT_FRAME:AddMessage("Current: " .. currentPlayer, 1, 0, 0)
+    return
+end
+
+local function countTableElements(tbl)
+    local count = 0
+    for _ in pairs(tbl) do count = count + 1 end
+    return count
+end
+
+local delay = 500
+local index = 0
+local elapsed = 0
+local totalCommands = countTableElements(commands)
+
+local indicatorFrame = CreateFrame("Frame", nil, UIParent)
+indicatorFrame:SetScript("OnUpdate", function(self)
+    elapsed = elapsed + 1
+    if elapsed >= delay or index == 0 then
+        index = index + 1
+        if index <= totalCommands then
+            SendChatMessage(commands[index])
+            elapsed = 0
+        else
+            indicatorFrame:SetScript("OnUpdate", nil)
+        end
+    end
+end)`
+
+    return luaScript
   }
 
   // Computed properties

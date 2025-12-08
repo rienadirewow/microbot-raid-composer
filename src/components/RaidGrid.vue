@@ -8,7 +8,7 @@
         :row-index="rowIndex"
         :is-current-player="row.character.id === currentPlayerId"
         :current-player-id="currentPlayerId"
-        @slot-click="(slotIndex) => $emit('slotClick', rowIndex, slotIndex)"
+        @slot-click="(slotIndex) => $emit('slotClick', row.character.id, slotIndex)"
         @set-current-player="$emit('updateCurrentPlayer', $event)"
       />
     </div>
@@ -31,7 +31,7 @@ const props = defineProps<Props>()
 
 // Emits
 defineEmits<{
-  slotClick: [rowIndex: number, slotIndex: number]
+  slotClick: [characterId: string, slotIndex: number]
   updateCurrentPlayer: [id: string]
 }>()
 

@@ -35,6 +35,7 @@ import type {
   TierType,
   TierLevel,
   RaidComposition as RaidCompositionType,
+  Race,
 } from '@/types'
 import RaidGrid from './RaidGrid.vue'
 import SlotAssignmentModal from './SlotAssignmentModal.vue'
@@ -153,7 +154,10 @@ const canAssignRole = (wowClass: WoWClass, role: Role): boolean => {
   return true // All classes can be DPS
 }
 
-const handleSlotClick = (rowIndex: number, slotIndex: number) => {
+const handleSlotClick = (characterId: string, slotIndex: number) => {
+  const rowIndex = composition.value.findIndex((row) => row.character.id === characterId)
+  if (rowIndex === -1) return
+
   assignmentModal.value = {
     isOpen: true,
     rowIndex,
@@ -165,7 +169,7 @@ const closeAssignmentModal = () => {
   assignmentModal.value.isOpen = false
 }
 
-const handleAssignSlot = (wowClass: WoWClass, role: Role, tierType: TierType, tier: TierLevel) => {
+const handleAssignSlot = (wowClass: WoWClass, role: Role, tierType: TierType, tier: TierLevel, race?: Race) => {
   const row = composition.value[assignmentModal.value.rowIndex]
   if (!row) return
 
@@ -176,6 +180,7 @@ const handleAssignSlot = (wowClass: WoWClass, role: Role, tierType: TierType, ti
     role,
     tier,
     tierType,
+    race,
     isCharacter: isFirstSlot,
     characterName: isFirstSlot ? row.character.name : undefined,
     isControlMember: row.character.name === 'Current Player',

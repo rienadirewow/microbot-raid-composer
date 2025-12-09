@@ -94,32 +94,15 @@ class SupabaseAdapter implements StorageAdapter {
         throw new Error('No authenticated user found')
       }
 
-      // First, try to get existing data
-      const { data: existingData } = await this.supabase
-        .from('user_data')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('data_type', key)
-        .single()
-
-      let error
-      if (existingData) {
-        // Update existing record
-        const { error: updateError } = await this.supabase
-          .from('user_data')
-          .update({ data: value })
-          .eq('user_id', user.id)
-          .eq('data_type', key)
-        error = updateError
-      } else {
-        // Insert new record
-        const { error: insertError } = await this.supabase.from('user_data').insert({
+      const { error } = await this.supabase.from('user_data').upsert(
+        {
           user_id: user.id,
           data_type: key,
           data: value,
-        })
-        error = insertError
-      }
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id,data_type' }
+      )
 
       if (error) {
         console.error('Supabase set error:', error)

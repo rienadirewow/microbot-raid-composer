@@ -392,6 +392,9 @@
           <p class="text-sm text-gray-600">
             Paste this Lua script in-game to hire your raid. Hiring order: current player's bots first (up to 4), then all lites, then remaining companions.
           </p>
+          <p class="text-sm text-gray-600">
+            Use <a href="https://github.com/rienadirewow/ScriptDeck" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline">this addon</a> to run the script in game.
+          </p>
         </div>
       </Modal>
     </div>

@@ -7,8 +7,21 @@
       </template>
     </PageHeader>
 
+    <!-- No Characters Warning - Show prominently before anything else -->
+    <EmptyState
+      v-if="charactersStore.totalCharacters === 0"
+      title="No characters found"
+      description="You need to add some characters before you can build raids."
+    >
+      <template #action>
+        <router-link to="/characters">
+          <Button size="lg">Go to Character Manager</Button>
+        </router-link>
+      </template>
+    </EmptyState>
+
     <!-- Combined Raid Container -->
-    <div v-if="raidsStore.currentRaid" class="bg-white rounded-lg shadow p-4">
+    <div v-else-if="raidsStore.currentRaid" class="bg-white rounded-lg shadow p-4">
       <!-- Line 1: Raid Name and Actions -->
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center space-x-2">
@@ -383,9 +396,9 @@
       </Modal>
     </div>
 
-    <!-- No Current Raid -->
+    <!-- No Current Raid (only show if characters exist) -->
     <EmptyState
-      v-else
+      v-else-if="charactersStore.totalCharacters > 0"
       title="No active raid"
       description="Create a new raid to get started with building your composition."
     >
@@ -409,18 +422,6 @@
       </div>
     </div>
 
-    <!-- Character Requirements -->
-    <WarningBanner
-      v-if="charactersStore.totalCharacters === 0"
-      title="No characters found"
-      description="You need to add some characters first before you can build raids."
-    >
-      <template #action>
-        <router-link to="/characters" class="underline font-medium"
-          >Go to Character Manager</router-link
-        >
-      </template>
-    </WarningBanner>
   </div>
 </template>
 
@@ -444,7 +445,6 @@ import { getDefaultRole, CLASS_ROLE_RESTRICTIONS } from '@/data/wow-data'
 import PageHeader from '../components/layout/PageHeader.vue'
 import Button from '../components/ui/Button.vue'
 import EmptyState from '../components/ui/EmptyState.vue'
-import WarningBanner from '../components/ui/WarningBanner.vue'
 import ProgressBar from '../components/ui/ProgressBar.vue'
 import SavedRaidCard from '../components/SavedRaidCard.vue'
 import RaidGrid from '../components/RaidGrid.vue'

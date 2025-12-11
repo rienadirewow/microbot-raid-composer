@@ -14,17 +14,36 @@ import type {
 import { useStorage } from '@/composables/useStorage'
 import { TOTAL_RAID_SLOTS, RAID_GROUPS, SLOTS_PER_GROUP } from '@/data/wow-data'
 import { useCharactersStore } from './characters'
+import { useAccountsStore } from './accounts'
 
 export const useRaidsStore = defineStore('raids', () => {
   const raids = ref<RaidComposition[]>([])
   const currentRaid = ref<RaidComposition | null>(null)
   const { getRaidCompositions, setRaidCompositions, isAuthenticated } = useStorage()
+  const accountsStore = useAccountsStore()
 
-  // Load raids from storage
   const loadRaids = async () => {
     try {
       const stored = await getRaidCompositions()
-      raids.value = stored || []
+      let loadedRaids = stored || []
+
+      let needsSave = false
+      loadedRaids = loadedRaids.map((raid) => {
+        if (!raid.accountId) {
+          needsSave = true
+          return {
+            ...raid,
+            accountId: 'default',
+          }
+        }
+        return raid
+      })
+
+      raids.value = loadedRaids
+
+      if (needsSave) {
+        await setRaidCompositions(raids.value)
+      }
     } catch (error) {
       console.error('Failed to load raids:', error)
       raids.value = []
@@ -54,6 +73,7 @@ export const useRaidsStore = defineStore('raids', () => {
 
     const newRaid: RaidComposition = {
       id: crypto.randomUUID(),
+      accountId: accountsStore.selectedAccountId!,
       name: name || 'New Raid',
       faction,
       currentPlayerId: undefined,
@@ -316,7 +336,18 @@ end)`
     return luaScript
   }
 
-  // Computed properties
+  const migrateRaidsToAccount = async (accountId: string) => {
+    raids.value = raids.value.map((raid) =>
+      !raid.accountId || raid.accountId === 'default' ? { ...raid, accountId } : raid
+    )
+    await setRaidCompositions(raids.value)
+  }
+
+  const accountRaids = computed(() => {
+    if (!accountsStore.selectedAccountId) return []
+    return raids.value.filter((r) => r.accountId === accountsStore.selectedAccountId)
+  })
+
   const currentRaidSlots = computed(() => currentRaid.value?.slots || [])
 
   const filledSlots = computed(
@@ -351,8 +382,10 @@ end)`
     deleteCurrentRaid,
     updateCurrentRaidName,
     generateExportString,
+    migrateRaidsToAccount,
 
     // Computed
+    accountRaids,
     currentRaidSlots,
     filledSlots,
     emptySlots,

@@ -122,7 +122,7 @@ const props = defineProps<Props>()
 // Emits
 const emit = defineEmits<{
   close: []
-  save: [characterData: Omit<PlayerCharacter, 'id' | 'createdAt'>]
+  save: [characterData: Omit<PlayerCharacter, 'id' | 'accountId' | 'createdAt'>]
 }>()
 
 // State
@@ -277,7 +277,7 @@ const handleSubmit = async () => {
     const allianceRaces = ['human', 'dwarf', 'nightelf', 'gnome']
     const faction: Faction = allianceRaces.includes(form.value.race) ? 'alliance' : 'horde'
 
-    const characterData: Omit<PlayerCharacter, 'id' | 'createdAt'> = {
+    const characterData: Omit<PlayerCharacter, 'id' | 'accountId' | 'createdAt'> = {
       name: form.value.name.trim(),
       faction,
       race: form.value.race,

@@ -18,8 +18,15 @@ export type AllianceRace = 'human' | 'dwarf' | 'nightelf' | 'gnome'
 export type HordeRace = 'orc' | 'undead' | 'tauren' | 'troll'
 export type Race = AllianceRace | HordeRace
 
+export interface Account {
+  id: string
+  name: string
+  createdAt: Date
+}
+
 export interface PlayerCharacter {
   id: string
+  accountId: string
   name: string
   class: WoWClass
   race: Race
@@ -100,6 +107,7 @@ export interface RaidSlotAssignment {
 
 export interface RaidComposition {
   id: string
+  accountId: string
   name: string
   faction: Faction
   currentPlayerId?: string  // Which character is the current player

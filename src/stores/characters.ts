@@ -1,34 +1,40 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
-import type { PlayerCharacter, Faction, TierLevel, Role } from '@/types'
+import type { PlayerCharacter, TierLevel, Role } from '@/types'
 import { useStorage } from '@/composables/useStorage'
+import { useAccountsStore } from './accounts'
 import { CLASS_DEFAULT_ROLES } from '@/data/wow-data'
 
 export const useCharactersStore = defineStore('characters', () => {
   const characters = ref<PlayerCharacter[]>([])
   const { getPlayerCharacters, setPlayerCharacters, isAuthenticated } = useStorage()
+  const accountsStore = useAccountsStore()
 
   // Load characters from storage
   const loadCharacters = async () => {
     try {
       const stored = await getPlayerCharacters()
       let loadedCharacters = stored || []
-      
-      // Migration: Add default roles to existing characters that don't have them
+
       let needsSave = false
-      loadedCharacters = loadedCharacters.map(character => {
-        if (!character.defaultRole && character.class) {
+      loadedCharacters = loadedCharacters.map((character) => {
+        let updated = { ...character }
+
+        if (!updated.accountId) {
           needsSave = true
-          return {
-            ...character,
-            defaultRole: CLASS_DEFAULT_ROLES[character.class]
-          }
+          updated = { ...updated, accountId: 'default' }
         }
-        return character
+
+        if (!updated.defaultRole && updated.class) {
+          needsSave = true
+          updated = { ...updated, defaultRole: CLASS_DEFAULT_ROLES[updated.class] }
+        }
+
+        return updated
       })
-      
+
       characters.value = loadedCharacters
-      
+
       // Save migrated data if needed
       if (needsSave) {
         await setPlayerCharacters(characters.value)
@@ -45,11 +51,22 @@ export const useCharactersStore = defineStore('characters', () => {
     await loadCharacters()
   })
 
-  // Add a new character
-  const addCharacter = async (character: Omit<PlayerCharacter, 'id' | 'createdAt'>) => {
+  const accountCharacters = computed(() => {
+    if (!accountsStore.selectedAccountId) return []
+    return characters.value.filter((c) => c.accountId === accountsStore.selectedAccountId)
+  })
+
+  const addCharacter = async (
+    character: Omit<PlayerCharacter, 'id' | 'accountId' | 'createdAt'>,
+  ) => {
+    if (!accountsStore.selectedAccountId) {
+      throw new Error('No account selected')
+    }
+
     const newCharacter: PlayerCharacter = {
       ...character,
       id: crypto.randomUUID(),
+      accountId: accountsStore.selectedAccountId,
       createdAt: new Date(),
     }
 
@@ -102,30 +119,34 @@ export const useCharactersStore = defineStore('characters', () => {
     return false
   }
 
-  // Get character by ID
   const getCharacterById = (id: string) => {
     return characters.value.find((c) => c.id === id)
   }
 
-  // Computed properties
+  const migrateCharactersToAccount = async (accountId: string) => {
+    characters.value = characters.value.map((char) =>
+      !char.accountId || char.accountId === 'default' ? { ...char, accountId } : char,
+    )
+    await setPlayerCharacters(characters.value)
+  }
+
   const allianceCharacters = computed(() =>
-    characters.value.filter((c) => c.faction === 'alliance'),
+    accountCharacters.value.filter((c) => c.faction === 'alliance'),
   )
 
-  const hordeCharacters = computed(() => characters.value.filter((c) => c.faction === 'horde'))
+  const hordeCharacters = computed(() =>
+    accountCharacters.value.filter((c) => c.faction === 'horde'),
+  )
 
   const charactersByFaction = computed(() => ({
     alliance: allianceCharacters.value,
     horde: hordeCharacters.value,
   }))
 
-  const totalCharacters = computed(() => characters.value.length)
+  const totalCharacters = computed(() => accountCharacters.value.length)
 
   return {
-    // State
     characters,
-
-    // Actions
     loadCharacters,
     addCharacter,
     updateCharacter,
@@ -133,8 +154,8 @@ export const useCharactersStore = defineStore('characters', () => {
     updateCharacterRole,
     deleteCharacter,
     getCharacterById,
-
-    // Computed
+    migrateCharactersToAccount,
+    accountCharacters,
     allianceCharacters,
     hordeCharacters,
     charactersByFaction,

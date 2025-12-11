@@ -1,5 +1,5 @@
 import { ref, computed, watch } from 'vue'
-import type { PlayerCharacter, RaidComposition, UserData } from '@/types'
+import type { PlayerCharacter, RaidComposition, UserData, Account } from '@/types'
 import { useSupabase } from './useSupabase'
 
 export interface StorageAdapter {
@@ -210,6 +210,14 @@ export const useStorage = () => {
   const clear = (): Promise<void> => adapter.value.clear()
   const keys = (): Promise<string[]> => adapter.value.keys()
 
+  const getAccounts = async (): Promise<Account[]> => {
+    return (await get<Account[]>('accounts')) ?? []
+  }
+
+  const setAccounts = async (accounts: Account[]): Promise<void> => {
+    await set('accounts', accounts)
+  }
+
   // Domain-specific methods for WoW data
   const getPlayerCharacters = async (): Promise<PlayerCharacter[]> => {
     const characters = (await get<PlayerCharacter[]>('characters')) ?? []
@@ -268,6 +276,8 @@ export const useStorage = () => {
     keys,
 
     // Domain-specific methods
+    getAccounts,
+    setAccounts,
     getPlayerCharacters,
     setPlayerCharacters,
     getRaidCompositions,

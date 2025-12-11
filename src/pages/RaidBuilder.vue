@@ -224,7 +224,7 @@
       <!-- Raid Grid -->
       <RaidGrid
         :composition="composition"
-        :characters="charactersStore.characters"
+        :characters="charactersStore.accountCharacters"
         :current-player-id="currentPlayerId"
         @slot-click="handleSlotClick"
         @update-current-player="handleUpdateCurrentPlayer"
@@ -240,7 +240,7 @@
           <h3 class="text-lg font-semibold text-gray-900 mb-4">Select Current Player</h3>
           <div class="space-y-2 max-h-64 overflow-y-auto">
             <button
-              v-for="character in charactersStore.characters"
+              v-for="character in charactersStore.accountCharacters"
               :key="character.id"
               @click="selectCurrentPlayer(character)"
               class="w-full text-left p-3 rounded-lg border-2 transition-all hover:shadow-md"
@@ -411,11 +411,11 @@
     </EmptyState>
 
     <!-- Saved Raids -->
-    <div v-if="raidsStore.raids.length > 0" class="mb-8 mt-8">
+    <div v-if="raidsStore.accountRaids.length > 0" class="mb-8 mt-8">
       <h2 class="text-xl font-semibold text-gray-900 mb-4">Saved Raids</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <SavedRaidCard
-          v-for="raid in raidsStore.raids"
+          v-for="raid in raidsStore.accountRaids"
           :key="raid.id"
           :raid-name="raid.name"
           :filled-slots="raid.slots.filter((s) => s.assignment).length"
@@ -509,7 +509,7 @@ watch(currentPlayerId, async (newPlayerId) => {
 
 // Computed
 const currentPlayer = computed(() => {
-  return charactersStore.characters.find((char) => char.id === currentPlayerId.value) || null
+  return charactersStore.accountCharacters.find((char) => char.id === currentPlayerId.value) || null
 })
 
 const currentSlot = computed(() => {
@@ -519,7 +519,7 @@ const currentSlot = computed(() => {
 
 const currentCharacter = computed(() => {
   const row = composition.value[assignmentModal.value.rowIndex]
-  return row?.character || charactersStore.characters[0]
+  return row?.character || charactersStore.accountCharacters[0]
 })
 
 const slotRemoveModalCharacter = computed(() => {
@@ -799,7 +799,7 @@ const cancelSlotRemove = () => {
 
 const initializeCharacterGroupsForNewRaid = () => {
   console.log('Initializing character groups for NEW raid...')
-  console.log('Characters:', charactersStore.characters)
+  console.log('Characters:', charactersStore.accountCharacters)
 
   // Calculate max characters we can include based on raid limit
   const maxRaidSize = 40
@@ -808,9 +808,9 @@ const initializeCharacterGroupsForNewRaid = () => {
 
   // Since each character starts with 1 lite by default, we can include at most maxAvailableSlots characters
   // This ensures we don't exceed the raid size limit even with just lite characters
-  const charactersToInclude = charactersStore.characters.slice(
+  const charactersToInclude = charactersStore.accountCharacters.slice(
     0,
-    Math.min(maxAvailableSlots, charactersStore.characters.length),
+    Math.min(maxAvailableSlots, charactersStore.accountCharacters.length),
   )
 
   // Initialize with empty slots and include lite characters by default
@@ -828,7 +828,7 @@ const initializeCharacterGroupsForNewRaid = () => {
       tierType: 'R',
       isCharacter: true,
       characterName: character.name,
-      isControlMember: false, // This is a lite clone, not the control member
+      isControlMember: false,
     }
 
     return {
@@ -845,14 +845,14 @@ const initializeCharacterGroupsForNewRaid = () => {
 const initializeCharacterGroups = () => {
   console.log('Initializing character groups for EXISTING raid...')
   console.log('Current raid:', raidsStore.currentRaid)
-  console.log('Characters:', charactersStore.characters)
+  console.log('Characters:', charactersStore.accountCharacters)
 
   if (raidsStore.currentRaid) {
     currentPlayerId.value = raidsStore.currentRaid.currentPlayerId || ''
 
     // Use new characterSlots structure if available
     if (raidsStore.currentRaid.characterSlots && raidsStore.currentRaid.characterSlots.length > 0) {
-      composition.value = charactersStore.characters.map((character) => {
+      composition.value = charactersStore.accountCharacters.map((character) => {
         const slots: (PlayerSlot | null)[] = Array(5).fill(null)
 
         // Find this character's slot group in the raid
@@ -895,10 +895,10 @@ const initializeCharacterGroups = () => {
       })
     } else {
       // Fall back to legacy slots structure
-      composition.value = charactersStore.characters.map((character) => {
+      composition.value = charactersStore.accountCharacters.map((character) => {
         const slots: (PlayerSlot | null)[] = Array(5).fill(null)
 
-        const characterIndex = charactersStore.characters.findIndex((c) => c.id === character.id)
+        const characterIndex = charactersStore.accountCharacters.findIndex((c) => c.id === character.id)
         if (characterIndex !== -1) {
           for (let i = 0; i < 5; i++) {
             const raidSlotIndex = characterIndex * 5 + i

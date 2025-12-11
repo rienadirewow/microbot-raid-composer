@@ -14,7 +14,7 @@
             class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
             :class="{ 'text-blue-600 bg-blue-50': $route.path === '/' }"
           >
-            Raid Builder ({{ raidsStore.raids.length }})
+            Raid Builder ({{ raidsStore.accountRaids.length }})
           </router-link>
           <router-link
             to="/characters"
@@ -23,6 +23,10 @@
           >
             Characters ({{ charactersStore.totalCharacters }})
           </router-link>
+        </div>
+
+        <div v-if="supabaseUser" class="hidden md:flex items-center">
+          <AccountSelector />
         </div>
 
         <!-- User Menu -->
@@ -92,6 +96,9 @@
         >
           Characters
         </router-link>
+        <div class="px-2 py-2">
+          <AccountSelector />
+        </div>
       </div>
     </div>
 
@@ -105,12 +112,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useCharactersStore } from '@/stores/characters'
 import { useRaidsStore } from '@/stores/raids'
+import { useAccountsStore } from '@/stores/accounts'
 import { useSupabase } from '@/composables/useSupabase'
+import { useMigration } from '@/composables/useMigration'
 import Button from '../ui/Button.vue'
 import GuestSignupModal from '../auth/GuestSignupModal.vue'
+import AccountSelector from '../ui/AccountSelector.vue'
 
 // State
 const mobileMenuOpen = ref(false)
@@ -119,33 +129,42 @@ const showSignUpModal = ref(false)
 // Stores
 const charactersStore = useCharactersStore()
 const raidsStore = useRaidsStore()
+const accountsStore = useAccountsStore()
 
 // Auth
 const { supabaseClient, supabaseUser } = useSupabase()
 
-// Watch for user state changes
-watch(supabaseUser, (user) => {})
+// Migration
+const { migrateToMultiAccount } = useMigration()
+
+watch(supabaseUser, async (newUser, oldUser) => {
+  const isInitialAuth = newUser && !oldUser
+  const isEmailVerification = oldUser?.is_anonymous && !newUser?.is_anonymous && newUser?.email
+
+  if (isInitialAuth || isEmailVerification) {
+    await Promise.all([
+      accountsStore.loadAccounts(),
+      charactersStore.loadCharacters(),
+      raidsStore.loadRaids(),
+    ])
+    await migrateToMultiAccount()
+  }
+}, { immediate: true })
 
 // Methods
 const handleSignupSuccess = () => {
   showSignUpModal.value = false
 }
 
-// Watch for user changes to detect when email verification is completed
-watch(supabaseUser, async (newUser, oldUser) => {
-  // Check if user just completed email verification (went from anonymous to permanent)
-  if (oldUser?.is_anonymous && !newUser?.is_anonymous && newUser?.email) {
-    // Reload data to ensure it's properly loaded
-    await Promise.all([charactersStore.loadCharacters(), raidsStore.loadRaids()])
-  }
-})
-
 const signOut = async () => {
   try {
     await supabaseClient.auth.signOut()
-
-    // Reload data after sign out
-    await Promise.all([charactersStore.loadCharacters(), raidsStore.loadRaids()])
+    await Promise.all([
+      accountsStore.loadAccounts(),
+      charactersStore.loadCharacters(),
+      raidsStore.loadRaids(),
+    ])
+    await migrateToMultiAccount()
   } catch (error) {
     console.error('Sign out error:', error)
   }

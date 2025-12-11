@@ -45,7 +45,7 @@
         />
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <CharacterCard
-            v-for="character in charactersStore.characters"
+            v-for="character in charactersStore.accountCharacters"
             :key="character.id"
             :character="character"
             @edit="editCharacter"
@@ -114,7 +114,7 @@ const closeForm = () => {
   editingCharacter.value = null
 }
 
-const saveCharacter = async (characterData: Omit<PlayerCharacter, 'id' | 'createdAt'>) => {
+const saveCharacter = async (characterData: Omit<PlayerCharacter, 'id' | 'accountId' | 'createdAt'>) => {
   try {
     if (editingCharacter.value) {
       await charactersStore.updateCharacter(editingCharacter.value.id, characterData)

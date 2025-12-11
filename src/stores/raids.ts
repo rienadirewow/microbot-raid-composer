@@ -57,6 +57,10 @@ export const useRaidsStore = defineStore('raids', () => {
 
   // Create a new raid
   const createNewRaid = (faction: Faction, name?: string) => {
+    if (!accountsStore.selectedAccountId) {
+      throw new Error('No account selected')
+    }
+
     // Create legacy slots for backward compatibility
     const slots: RaidSlot[] = []
     let slotNumber = 1
@@ -73,7 +77,7 @@ export const useRaidsStore = defineStore('raids', () => {
 
     const newRaid: RaidComposition = {
       id: crypto.randomUUID(),
-      accountId: accountsStore.selectedAccountId!,
+      accountId: accountsStore.selectedAccountId,
       name: name || 'New Raid',
       faction,
       currentPlayerId: undefined,
@@ -338,7 +342,7 @@ end)`
 
   const migrateRaidsToAccount = async (accountId: string) => {
     raids.value = raids.value.map((raid) =>
-      !raid.accountId || raid.accountId === 'default' ? { ...raid, accountId } : raid
+      !raid.accountId || raid.accountId === 'default' ? { ...raid, accountId } : raid,
     )
     await setRaidCompositions(raids.value)
   }

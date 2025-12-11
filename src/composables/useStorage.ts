@@ -2,7 +2,7 @@ import { ref, computed, watch } from 'vue'
 import type { PlayerCharacter, RaidComposition, UserData, Account } from '@/types'
 import { useSupabase } from './useSupabase'
 
-export interface StorageAdapter {
+interface StorageAdapter {
   get<T>(key: string): Promise<T | null>
   set<T>(key: string, value: T): Promise<void>
   remove(key: string): Promise<void>

@@ -173,6 +173,7 @@
 import { ref, computed, h, watch } from 'vue'
 import type { PlayerSlot, PlayerCharacter, Role, WoWClass, TierType, TierLevel, Race } from '@/types'
 import { CLASS_ROLE_RESTRICTIONS, CLASS_DEFAULT_ROLES, ALLIANCE_RACES, HORDE_RACES, CLASS_RACE_RESTRICTIONS } from '@/data/wow-data'
+import { getClassColor } from '@/data/classes'
 import Modal from './ui/Modal.vue'
 import Button from './ui/Button.vue'
 
@@ -606,20 +607,6 @@ const getClassDisplayName = (wowClass: string) => {
   return classNames[wowClass] || wowClass
 }
 
-const getClassColor = (wowClass: string) => {
-  const classColors: Record<string, string> = {
-    warrior: '#C79C6E',
-    paladin: '#F58CBA',
-    hunter: '#ABD473',
-    rogue: '#FFF569',
-    priest: '#FFFFFF',
-    shaman: '#0070DE',
-    mage: '#69CCF0',
-    warlock: '#9482C9',
-    druid: '#FF7D0A',
-  }
-  return classColors[wowClass] || '#6B7280'
-}
 
 const getCurrentTier = () => {
   if (props.isFirstSlot && props.character) {

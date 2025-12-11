@@ -34,6 +34,7 @@
 <script setup lang="ts">
 import { computed, h } from 'vue'
 import type { PlayerSlot, PlayerCharacter, Role } from '@/types'
+import { getClassColor } from '@/data/classes'
 
 // Props
 interface Props {
@@ -169,20 +170,6 @@ const getClassDisplayName = (wowClass: string) => {
   return classNames[wowClass] || wowClass
 }
 
-const getClassColor = (wowClass: string) => {
-  const classColors: Record<string, string> = {
-    warrior: '#C79C6E',
-    paladin: '#F58CBA',
-    hunter: '#ABD473',
-    rogue: '#FFF569',
-    priest: '#FFFFFF',
-    shaman: '#0070DE',
-    mage: '#69CCF0',
-    warlock: '#9482C9',
-    druid: '#FF7D0A',
-  }
-  return classColors[wowClass] || '#6B7280'
-}
 
 const getTierTextColor = () => {
   if (!props.slot) {

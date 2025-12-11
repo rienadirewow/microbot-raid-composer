@@ -24,18 +24,6 @@ export const CLASS_ROLE_RESTRICTIONS: Record<WoWClass, Role[]> = {
   druid: ['mdps', 'rdps', 'healer', 'tank'],
 }
 
-export const CLASS_SPEC_RESTRICTIONS: Record<WoWClass, string[]> = {
-  warrior: ['arms', 'fury', 'protection'],
-  paladin: ['protection', 'retribution', 'holy'],
-  hunter: ['marksmanship', 'survival', 'beast mastery'],
-  rogue: ['assassination', 'combat', 'subtlety'],
-  priest: ['discipline', 'holy', 'shadow'],
-  shaman: ['elemental', 'enhancement', 'restoration'],
-  mage: ['arcane', 'fire', 'frost'],
-  warlock: ['affliction', 'demonology', 'destruction'],
-  druid: ['balance', 'feral', 'restoration'],
-}
-
 export const ALLIANCE_RACES: AllianceRace[] = ['human', 'dwarf', 'nightelf', 'gnome']
 export const HORDE_RACES: HordeRace[] = ['orc', 'undead', 'tauren', 'troll']
 
@@ -51,9 +39,6 @@ export const CLASS_DEFAULT_ROLES: Record<WoWClass, Role> = {
   warlock: 'rdps',
   druid: 'healer',
 }
-
-export const getFactionFromRace = (race: Race): Faction =>
-  ALLIANCE_RACES.includes(race as AllianceRace) ? 'alliance' : 'horde'
 
 export const validateClassRace = (wowClass: WoWClass, race: Race): boolean =>
   CLASS_RACE_RESTRICTIONS[wowClass].includes(race)

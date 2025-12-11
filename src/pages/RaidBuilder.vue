@@ -445,6 +445,7 @@ import type {
 import { useCharactersStore } from '@/stores/characters'
 import { useRaidsStore } from '@/stores/raids'
 import { getDefaultRole, CLASS_ROLE_RESTRICTIONS } from '@/data/wow-data'
+import { getClassColor } from '@/data/classes'
 import PageHeader from '../components/layout/PageHeader.vue'
 import Button from '../components/ui/Button.vue'
 import EmptyState from '../components/ui/EmptyState.vue'
@@ -1068,20 +1069,6 @@ const capitalizeFirst = (str: string) => {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
 }
 
-const getClassColor = (wowClass: string) => {
-  const classColors: Record<string, string> = {
-    warrior: '#C79C6E',
-    paladin: '#F58CBA',
-    hunter: '#ABD473',
-    rogue: '#FFF569',
-    priest: '#FFFFFF',
-    shaman: '#0070DE',
-    mage: '#69CCF0',
-    warlock: '#9482C9',
-    druid: '#FF7D0A',
-  }
-  return classColors[wowClass] || '#6B7280'
-}
 
 const getClassDisplayName = (wowClass: string) => {
   const classNames: Record<string, string> = {

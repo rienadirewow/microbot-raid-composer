@@ -58,14 +58,6 @@ export interface CharacterRow {
 
 export type Composition = CharacterRow[]
 
-// Legacy interfaces for backward compatibility
-export interface Companion {
-  class: WoWClass
-  role: Role
-  spec?: string
-  tier: TierLevel
-}
-
 export interface CompanionAssignment {
   id: string
   name: string
@@ -76,13 +68,6 @@ export interface CompanionAssignment {
   ownerId: string
 }
 
-export interface CharacterRaidGroup {
-  character_id: string
-  include_copy_in_raid: boolean
-  is_current_player: boolean
-  companions: Companion[]
-}
-
 export interface RaidSlot {
   slot: number
   group: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
@@ -91,18 +76,24 @@ export interface RaidSlot {
 
 export interface CharacterSlotGroup {
   characterId: string
-  liteSlot: RaidSlotAssignment | null      // Slot 0: Lite clone (free)
-  companionSlots: (RaidSlotAssignment | null)[]  // Slots 1-4: Hired companions
-}
-
-export interface RaidSlotAssignment {
-  class: WoWClass
-  role: Role
-  tier: TierLevel
-  tierType: TierType
-  race?: Race
-  isLite: boolean
-  characterName?: string
+  liteSlot: {
+    class: WoWClass
+    role: Role
+    tier: TierLevel
+    tierType: TierType
+    race?: Race
+    isLite: boolean
+    characterName?: string
+  } | null
+  companionSlots: ({
+    class: WoWClass
+    role: Role
+    tier: TierLevel
+    tierType: TierType
+    race?: Race
+    isLite: boolean
+    characterName?: string
+  } | null)[]
 }
 
 export interface RaidComposition {

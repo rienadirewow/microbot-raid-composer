@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white rounded-lg shadow p-6">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
     <div class="flex items-center">
       <div class="p-2 rounded-lg" :class="iconBgClass">
         <svg
@@ -13,8 +13,8 @@
         </svg>
       </div>
       <div class="ml-4">
-        <p class="text-sm font-medium text-gray-600">{{ label }}</p>
-        <p class="text-2xl font-bold text-gray-900">{{ value }}</p>
+        <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ label }}</p>
+        <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ value }}</p>
       </div>
     </div>
   </div>
@@ -38,9 +38,9 @@ const props = withDefaults(defineProps<Props>(), {
 // Computed
 const iconBgClass = computed(() => {
   const classes = {
-    blue: 'bg-blue-100',
-    green: 'bg-green-100',
-    red: 'bg-red-100',
+    blue: 'bg-blue-100 dark:bg-blue-900/30',
+    green: 'bg-green-100 dark:bg-green-900/30',
+    red: 'bg-red-100 dark:bg-red-900/30',
   }
   return classes[props.variant]
 })

@@ -110,11 +110,14 @@ export interface RaidComposition {
   updatedAt: Date
 }
 
+export type ThemePreference = 'light' | 'dark' | 'system'
+
 export interface UserData {
   characters: PlayerCharacter[]
   raids: RaidComposition[]
   settings: {
     defaultFaction?: Faction
     autoSave: boolean
+    theme?: ThemePreference
   }
 }

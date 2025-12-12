@@ -2,7 +2,7 @@
   <div class="relative" ref="dropdownRef">
     <button
       @click="isOpen = !isOpen"
-      class="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -27,20 +27,20 @@
 
     <div
       v-if="isOpen"
-      class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border z-50"
+      class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50"
     >
       <div class="py-1 max-h-64 overflow-y-auto">
         <button
           v-for="account in accountsStore.accounts"
           :key="account.id"
           @click="selectAccount(account.id)"
-          class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-          :class="{ 'bg-blue-50': account.id === accountsStore.selectedAccountId }"
+          class="flex items-center justify-between w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+          :class="{ 'bg-blue-50 dark:bg-blue-900/30': account.id === accountsStore.selectedAccountId }"
         >
           <span class="truncate">{{ account.name }}</span>
           <svg
             v-if="account.id === accountsStore.selectedAccountId"
-            class="w-4 h-4 text-blue-600 flex-shrink-0 ml-2"
+            class="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 ml-2"
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -52,10 +52,10 @@
           </svg>
         </button>
       </div>
-      <div class="border-t">
+      <div class="border-t border-gray-200 dark:border-gray-700">
         <button
           @click="openManageModal"
-          class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          class="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
         >
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path

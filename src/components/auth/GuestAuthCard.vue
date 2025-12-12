@@ -1,11 +1,11 @@
 <template>
-  <div class="bg-white rounded-lg shadow-lg p-8">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
     <div class="text-center">
       <div
-        class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4"
+        class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4"
       >
         <svg
-          class="w-8 h-8 text-gray-600"
+          class="w-8 h-8 text-gray-600 dark:text-gray-300"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -18,27 +18,27 @@
           />
         </svg>
       </div>
-      <h2 class="text-2xl font-semibold text-gray-900 mb-4">Continue as Guest</h2>
-      <p class="text-gray-600 mb-6">
+      <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Continue as Guest</h2>
+      <p class="text-gray-600 dark:text-gray-400 mb-6">
         Start building raids immediately. Your data will be saved and you can sign up with
         an email later.
       </p>
-      
+
       <div v-if="error" class="text-red-600 text-sm mb-4">
         {{ error }}
       </div>
 
-      <Button 
-        variant="secondary" 
-        size="lg" 
-        class="w-full" 
+      <Button
+        variant="secondary"
+        size="lg"
+        class="w-full"
         :disabled="loading"
         @click="signInAnonymously"
       >
         {{ loading ? 'Getting Started...' : 'Get Started' }}
       </Button>
-      
-      <p class="text-gray-600 text-xs mt-2">
+
+      <p class="text-gray-600 dark:text-gray-400 text-xs mt-2">
         Your data will be available only in this browser on this device.
       </p>
     </div>

@@ -1,25 +1,25 @@
 <template>
-  <nav class="bg-white shadow-sm border-b">
+  <nav class="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">
     <div class="max-w-screen-xl mx-auto px-4">
       <div class="flex items-center justify-between h-16">
         <!-- Logo and Title -->
         <div class="flex items-center space-x-4">
-          <h1 class="text-xl font-bold text-gray-900">Microbot-wow Raid Builder</h1>
+          <h1 class="text-xl font-bold text-gray-900 dark:text-white">Microbot-wow Raid Builder</h1>
         </div>
 
         <!-- Navigation Links -->
         <div v-if="supabaseUser" class="hidden md:flex items-center space-x-8">
           <router-link
             to="/"
-            class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            :class="{ 'text-blue-600 bg-blue-50': $route.path === '/' }"
+            class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            :class="{ 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30': $route.path === '/' }"
           >
             Raid Builder ({{ raidsStore.accountRaids.length }})
           </router-link>
           <router-link
             to="/characters"
-            class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            :class="{ 'text-blue-600 bg-blue-50': $route.path === '/characters' }"
+            class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            :class="{ 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30': $route.path === '/characters' }"
           >
             Characters ({{ charactersStore.totalCharacters }})
           </router-link>
@@ -31,28 +31,13 @@
 
         <!-- User Menu -->
         <div v-if="supabaseUser" class="flex items-center space-x-4">
-          <!-- Character Count Badge
-          <div class="hidden sm:flex items-center space-x-2 text-sm text-gray-600">
-            <span>{{ charactersStore.totalCharacters }} characters</span>
-            <span class="text-gray-300">|</span>
-            <span>{{ raidsStore.raids.length }} raids</span>
-          </div> -->
-
           <!-- User Info and Actions -->
           <div class="flex items-center space-x-2">
-            <span class="text-sm text-gray-600">
+            <span class="text-sm text-gray-600 dark:text-gray-300">
               {{ supabaseUser.email || 'Guest User' }}
             </span>
 
-            <!-- Sign Up button for guest users - disabled for now
-            <Button
-              v-if="supabaseUser && supabaseUser.is_anonymous"
-              size="sm"
-              @click="showSignUpModal = true"
-            >
-              Sign Up
-            </Button>
-            -->
+            <ThemeToggle />
 
             <Button variant="secondary" size="sm" @click="signOut"> Sign Out </Button>
           </div>
@@ -64,7 +49,7 @@
     <div v-if="supabaseUser" class="md:hidden">
       <button
         @click="mobileMenuOpen = !mobileMenuOpen"
-        class="text-gray-600 hover:text-gray-900 p-2"
+        class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white p-2"
       >
         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
@@ -78,20 +63,20 @@
     </div>
 
     <!-- Mobile Menu -->
-    <div v-if="mobileMenuOpen && supabaseUser" class="md:hidden">
+    <div v-if="mobileMenuOpen && supabaseUser" class="md:hidden bg-white dark:bg-gray-900">
       <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
         <router-link
           to="/"
-          class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
-          :class="{ 'text-blue-600 bg-blue-50': $route.path === '/' }"
+          class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+          :class="{ 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30': $route.path === '/' }"
           @click="mobileMenuOpen = false"
         >
           Raid Builder
         </router-link>
         <router-link
           to="/characters"
-          class="text-gray-600 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium"
-          :class="{ 'text-blue-600 bg-blue-50': $route.path === '/characters' }"
+          class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+          :class="{ 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30': $route.path === '/characters' }"
           @click="mobileMenuOpen = false"
         >
           Characters
@@ -121,6 +106,7 @@ import { useMigration } from '@/composables/useMigration'
 import Button from '../ui/Button.vue'
 import GuestSignupModal from '../auth/GuestSignupModal.vue'
 import AccountSelector from '../ui/AccountSelector.vue'
+import ThemeToggle from '../ui/ThemeToggle.vue'
 
 // State
 const mobileMenuOpen = ref(false)

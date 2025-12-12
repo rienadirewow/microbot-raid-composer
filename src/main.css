@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @source "../node_modules/@supa-kit/auth-ui-vue";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 button {
   @apply cursor-pointer;
 }

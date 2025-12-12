@@ -2,8 +2,8 @@
   <div class="mb-8">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900">{{ title }}</h1>
-        <p class="mt-2 text-gray-600">{{ description }}</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ title }}</h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">{{ description }}</p>
       </div>
       <div v-if="$slots.action" class="flex items-center space-x-4">
         <slot name="action" />
